@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/background1">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/title2"
+        android:id="@+id/imageView"
+        android:adjustViewBounds="true"
+        android:layout_marginTop="32dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:contentDescription="@string/game_title"/>
+
+    <Button
+        android:text="Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/button4"
+        android:layout_alignBaseline="@+id/about_button"
+        android:layout_alignBottom="@+id/about_button"
+        android:layout_toEndOf="@+id/play_button"
+        android:background="#0C26C3"
+        android:textSize="20sp"
+        android:textColor="#ffffff"
+        android:textStyle="normal|bold"/>
+
+    <Button
+        android:text="@string/about"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/about_button"
+        android:textSize="20sp"
+        android:background="#FFF800"
+        android:textColor="#000000"
+        android:textStyle="normal|bold"
+        android:layout_below="@+id/play_button"
+        android:layout_toStartOf="@+id/button4" />
+
+    <Button
+        android:text="@string/play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="121dp"
+        android:id="@+id/play_button"
+        android:textSize="20sp"
+        android:background="#00B600"
+        android:textColor="#ffffff"
+        android:textStyle="normal|bold"
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:text="@string/score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/score_button"
+        android:textSize="20sp"
+        android:background="#E40000"
+        android:textColor="#ffffff"
+        android:textStyle="normal|bold"
+        android:layout_above="@+id/button4"
+        android:layout_toEndOf="@+id/play_button" />
+</RelativeLayout>
