@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">Simon</string>
     <string name="action_settings">Settings</string>
+    <string name="play">Play</string>
+    <string name="about">About</string>
+    <string name="score">Score</string>
+    <string name="game_title">Simon</string>
+
+
 </resources>
