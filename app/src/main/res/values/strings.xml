@@ -5,6 +5,10 @@
     <string name="about">About</string>
     <string name="score">Score</string>
     <string name="game_title">Simon</string>
+    <string name="yellow_button">Yellow Button</string>
+    <string name="cyan_button">Cyan Button</string>
+    <string name="red_button">Red Button</string>
+    <string name="green_button">Green Button</string>
 
 
 </resources>

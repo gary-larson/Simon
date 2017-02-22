@@ -17,4 +17,50 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Hello World!" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/yellow_bl"
+        android:contentDescription="@string/yellow_button"
+        android:id="@+id/bottomLeft_imageButton"
+        android:layout_centerVertical="true"
+        android:layout_alignStart="@+id/topLeft_imageButton"
+        android:background="@android:color/black"
+        android:scaleType="fitCenter" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/green_tl"
+        android:contentDescription="@string/green_button"
+        android:id="@+id/topLeft_imageButton"
+        android:scaleType="fitCenter"
+        android:background="@android:color/black"
+        android:layout_above="@+id/bottomLeft_imageButton"
+        android:layout_toStartOf="@+id/bottomRight_imageButton"
+         />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/red_tr"
+        android:contentDescription="@string/red_button"
+        android:id="@+id/topRight_imageButton"
+        android:layout_marginEnd="88dp"
+        android:background="@android:color/black"
+        android:scaleType="fitCenter"
+        android:layout_alignTop="@+id/topLeft_imageButton"
+        android:layout_alignParentEnd="true" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/cyan_br"
+        android:contentDescription="@string/cyan_button"
+        android:id="@+id/bottomRight_imageButton"
+        android:background="@android:color/black"
+        android:scaleType="fitCenter"
+        android:layout_below="@+id/topRight_imageButton"
+        android:layout_alignStart="@+id/topRight_imageButton" />
 </RelativeLayout>
