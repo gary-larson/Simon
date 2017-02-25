@@ -1,16 +1,20 @@
 package com.example.gary.simon;
 
+import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.ImageButton;
 
 import java.util.Timer;
@@ -46,6 +50,10 @@ public class MainActivity extends AppCompatActivity
         ib.setOnClickListener(this);
         ib = (ImageButton) findViewById(R.id.bottomRight_imageButton);
         ib.setOnClickListener(this);
+
+        //Set up listener for about button
+         findViewById(R.id.about_button).setOnClickListener(new AboutApp());
+
     }
 
     // method to change image to pressed image and start the timer
@@ -146,5 +154,42 @@ public class MainActivity extends AppCompatActivity
                     break;
             }
         }
+
     }
+
+    /******************************************************************************************
+     * Class creates alertDialog to display apps' information about the developers and
+     * credits to all sounds and images used
+     *****************************************************************************************/
+    class AboutApp implements View.OnClickListener{
+       @Override
+        public void onClick(View view){
+            String message = "<html>"+
+                    "<h2>About App</h2>" +
+                    "<p><b>Programmers: </b>Gary Larson And Antonio Ramos <br>"+
+                    "<h2>Sounds</h2>" +
+                    "<b>Source:</b> ? <br>" +
+                    "<b>Creator:</b> ? <br>" +
+                    "<b>Link: </b> <a href='http://websethere/content/space-boss-battle-theme'>source website</a><br>" +
+                    "<b>License: </b> ???" +
+                    "<h2>Images </h2>" +
+                    "<b>Source:</b> ? <br>" +
+                    "<b>Creator:</b> ? <br>" +
+                    "<b>Link: </b> <a href='http://websethere.com/content/space-boss-battle-theme'>source website</a><br>" +
+                    "<b>License: </b> ?" +
+
+                    "</p></html>";
+
+           AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+           builder.setMessage(Html.fromHtml(message));
+           builder.setPositiveButton("OK", null);
+
+           AlertDialog dialog = builder.create();
+           dialog.show();
+
+           Log.i("check", "about is working");
+
+       }
+    }
+
 }
