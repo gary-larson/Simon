@@ -11,12 +11,8 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.gary.simon.MainActivity"
-    tools:showIn="@layout/activity_main">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
+    tools:showIn="@layout/activity_main"
+    android:background="@drawable/background1">
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -63,4 +59,31 @@
         android:scaleType="fitCenter"
         android:layout_below="@+id/topRight_imageButton"
         android:layout_alignStart="@+id/topRight_imageButton" />
+
+    <Button
+        android:text="About"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="44dp"
+        android:id="@+id/about_button"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@+id/bottomLeft_imageButton" />
+
+    <Button
+        android:text="Pause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/about_button"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/pause_button" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/three1"
+        android:id="@+id/count"
+        android:visibility="invisible"
+        android:layout_alignTop="@+id/topLeft_imageButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="44dp" />
 </RelativeLayout>
