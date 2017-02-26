@@ -25,6 +25,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -36,15 +37,18 @@ public class MainActivity extends AppCompatActivity
     private final int BUTTON_DELAY_1 = 500;
     private final int BUTTON_DELAY_2 = 400;
     private final int BUTTON_DELAY_3 = 300;
+    private final int PLAYER_RESPONSE_MULTIPLIER = 4;
 
     // Set constants for saving and comparing sequences
     private final int TOP_LEFT = 1;
     private final int TOP_RIGHT = 2;
     private final int BOTTOM_LEFT = 3;
     private final int BOTTOM_RIGHT = 4;
+    private final int MAX_SEQ_LENGTH = 90;
 
     // setup member variables
     private Timer timer;
+    private Timer playerRespondTimer;
     // iIb is current ImageButton, iDr is current Drawable, iDelay is current speed of the game
     private int iIb, iDr, iDelay = BUTTON_DELAY_1;
     private int count = 0;
@@ -56,10 +60,17 @@ public class MainActivity extends AppCompatActivity
     private int sound_br_Id;
     private int sound_tl_Id;
     private int sound_tr_Id;
+    private int buzzer_Id;
 
     private CountDownTask countDownTask;
     private boolean delayCountDown = false;
     private final int [] countNumbers= {R.drawable.three1,R.drawable.two1,R.drawable.one1};
+
+    // Gameplay Variables
+    private int[] simonSequence;
+    private boolean isSimonsTurn = true;
+    private int simonSeqCurrent = 0;
+    Random rand;
 
 
     @Override
@@ -70,8 +81,14 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //Initialize sequence Array
+        simonSequence = new int[MAX_SEQ_LENGTH];
+
         // SoundPool variable initialization
         soundsLoaded = new HashSet<Integer>();
+
+        // setup random generator
+        rand = new Random();
 
         // Set up the listeners for the four buttons (all the same listener)
         ImageButton ib = (ImageButton) findViewById(R.id.topLeft_imageButton);
@@ -92,6 +109,16 @@ public class MainActivity extends AppCompatActivity
         b.setOnClickListener(this);
         //Set up listener for about button
         findViewById(R.id.about_button).setOnClickListener(new AboutApp());
+
+        // Test sequence for simons turn
+        for (int i = 0; i < 6; i++) {
+            simonSequence[i] = rand.nextInt(4) + 1;
+        }
+
+    }
+
+    private void playSimonSequence() {
+        playSimonNext();
     }
 
     // method to change image to pressed image and start the timer
@@ -108,6 +135,54 @@ public class MainActivity extends AppCompatActivity
     private void resetImageButton(int dr) {
         ImageButton ib = (ImageButton) findViewById(iIb);
         ib.setImageResource (dr);
+        if (isSimonsTurn) {
+            playSimonNext();
+        } else {
+            // start timer for player to respond
+            if (playerRespondTimer == null) {
+                playerRespondTimer = new Timer();
+                playerRespondTimer.schedule(new PlayerTimeExpiredTask(), iDelay * PLAYER_RESPONSE_MULTIPLIER);
+            }
+        }
+    }
+
+    private void playSimonNext() {
+        if (simonSequence[simonSeqCurrent] > 0) {
+            switch (simonSequence[simonSeqCurrent]) {
+                case 1:
+                    iIb = R.id.topLeft_imageButton;
+                    iDr = R.drawable.green_tl;
+                    setImageButton(R.drawable.pressed_tl);
+                    playSound(sound_tl_Id);
+                    break;
+                case 2:
+                    iIb = R.id.topRight_imageButton;
+                    iDr = R.drawable.red_tr;
+                    setImageButton(R.drawable.pressed_tr);
+                    playSound(sound_tr_Id);
+                    break;
+                case 3:
+                    iIb = R.id.bottomLeft_imageButton;
+                    iDr = R.drawable.yellow_bl;
+                    setImageButton(R.drawable.pressed_bl);
+                    playSound(sound_bl_Id);
+                    break;
+                case 4:
+                    iIb = R.id.bottomRight_imageButton;
+                    iDr = R.drawable.cyan_br;
+                    setImageButton(R.drawable.pressed_br);
+                    playSound(sound_br_Id);
+                    break;
+            }
+            simonSeqCurrent++;
+        } else {
+            isSimonsTurn = false;
+            // start timer for player to respond
+            if (playerRespondTimer == null) {
+                playerRespondTimer = new Timer();
+                playerRespondTimer.schedule(new PlayerTimeExpiredTask(), iDelay * PLAYER_RESPONSE_MULTIPLIER);
+            }
+        }
     }
 
 
@@ -143,6 +218,7 @@ public class MainActivity extends AppCompatActivity
         sound_br_Id = soundpool.load(this, R.raw.sound_br, 1);
         sound_tl_Id = soundpool.load(this, R.raw.sound_tl, 1);
         sound_tr_Id = soundpool.load(this, R.raw.sound_tr, 1);
+        buzzer_Id = soundpool.load(this, R.raw.buzzer, 1);
 
         //set delayCountDown to true to delay countdown thread to allow game time to set up
         delayCountDown=true;
@@ -154,6 +230,7 @@ public class MainActivity extends AppCompatActivity
     protected void onPause() {
         super.onPause();
         cancelButton();
+        cancelPlayer();
         if (soundpool != null) {
             soundpool.release();
             soundpool = null;
@@ -221,24 +298,28 @@ public class MainActivity extends AppCompatActivity
         if (timer == null) {
             switch (v.getId()) {
                 case R.id.topLeft_imageButton:
+                    // stop timer for player to respond
                     iIb = R.id.topLeft_imageButton;
                     iDr = R.drawable.green_tl;
                     setImageButton(R.drawable.pressed_tl);
                     playSound(sound_tl_Id);
                     break;
                 case R.id.topRight_imageButton:
+                    // stop timer for player to respond
                     iIb = R.id.topRight_imageButton;
                     iDr = R.drawable.red_tr;
                     setImageButton(R.drawable.pressed_tr);
                     playSound(sound_tr_Id);
                     break;
                 case R.id.bottomLeft_imageButton:
+                    // stop timer for player to respond
                     iIb = R.id.bottomLeft_imageButton;
                     iDr = R.drawable.yellow_bl;
                     setImageButton(R.drawable.pressed_bl);
                     playSound(sound_bl_Id);
                     break;
                 case R.id.bottomRight_imageButton:
+                    // stop timer for player to respond
                     iIb = R.id.bottomRight_imageButton;
                     iDr = R.drawable.cyan_br;
                     setImageButton(R.drawable.pressed_br);
@@ -252,6 +333,8 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+
+    // plays sound related to button
     private void playSound (int iSound) {
         if (soundsLoaded.contains(iSound)) {
             soundpool.play(iSound, 1.0f, 1.0f, 0, 0, (float) iDelay / (float) BUTTON_DELAY_1);
@@ -270,10 +353,21 @@ public class MainActivity extends AppCompatActivity
                     "<h2>About App</h2>" +
                     "<p><b>Programmers: </b>Gary Larson And Antonio Ramos <br>"+
                     "<h2>Sounds</h2>" +
-                    "<b>Source:</b> ? <br>" +
-                    "<b>Creator:</b> ? <br>" +
-                    "<b>Link: </b> <a href='http://websethere/content/space-boss-battle-theme'>source website</a><br>" +
-                    "<b>License: </b> ???" +
+                    "<b>Source:</b>Sound associated with Simon's Button Image<br>" +
+                    "<b>Creator:</b>Simon Dalzell<br>" +
+                    "<b>Description:</b>Organ - quiet - A4 (NT5_Man3Quiet_155_rr1.wav)<br>" +
+                    "<b>Link: </b> <a href='http://www.freesound.org/people/Samulis/sounds/373717/'>source website</a><br>" +
+                    "<b>Description:</b>Organ - quiet - C4 (NT5_Man3Quiet_146_rr1.wav)<br>" +
+                    "<b>Link: </b> <a href='http://www.freesound.org/people/Samulis/sounds/373714/'>source website</a><br>" +
+                    "<b>Description:</b>Organ - quiet - D#4 (NT5_Man3Quiet_149_rr1.wav)<br>" +
+                    "<b>Link: </b> <a href='http://www.freesound.org/people/Samulis/sounds/373715/'>source website</a><br>" +
+                    "<b>Description:</b>Organ - quiet - F4 (NT5_Man3Quiet_152_rr1.wav)<br>" +
+                    "<b>Link: </b> <a href='http://www.freesound.org/people/Samulis/sounds/373716/'>source website</a><br>" +
+                    "<b>License: </b> Creative Commons 0<br>" +
+                    "<b>Source:</b>Sound to alert player time is up<br>" +
+                    "<b>Creator:</b>hypocore<br>" +
+                    "<b>Description:</b>Buzzer<br>" +
+                    "<b>Link: </b> <a href='http://www.freesound.org/people/hypocore/sounds/164090/'>source website</a><br>" +
                     "<h2>Images </h2>" +
                     "<b>Source:</b> Background Image <br>" +
                     "<b>Creator:</b> Viscious-Speed <br>" +
@@ -369,6 +463,37 @@ public class MainActivity extends AppCompatActivity
             im.setVisibility(View.INVISIBLE);
             rl.setBackgroundResource(R.drawable.background1);
             delayCountDown = false;
+
+            // added to start game
+            playSimonSequence();
+        }
+    }
+
+    private class PlayerTimeExpiredTask extends TimerTask {
+        @Override
+        public void run() {
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    playerOutOfTime();
+                    Log.i("PlayerExpiredTask", "-------------- AGAIN");
+                }
+            });
+            cancelPlayer();
+        }
+    }
+
+    // Player did not respond in time
+    private void playerOutOfTime() {
+        playSound(buzzer_Id);
+    }
+
+    // Cancels player Respond Timer
+    private void cancelPlayer() {
+        if (playerRespondTimer != null) {
+            playerRespondTimer.cancel();
+            playerRespondTimer = null;
         }
     }
 }
