@@ -258,11 +258,14 @@ public class MainActivity extends AppCompatActivity
 
     }
     private void newGame(){
+        TextView tv =(TextView) findViewById(R.id.score_textView);
+        tv.setText(String.valueOf(0));
+        simonSeqCurrent=0;
         startCountdownGame();
         resetCheckValues();
     }
     /*********************************************************************************************
-    * method will compare simons sequence to users input correct return true and start next round
+    * method will compare Simon's sequence to users input correct return true and start next round
      * if not correct buzz and ask user to start new game.
      *********************************************************************************************/
     public boolean checkPlayerInPut(int input){
@@ -270,11 +273,9 @@ public class MainActivity extends AppCompatActivity
             return true;
 
         }else {
-            PlayerTimeExpiredTask playerTimeExpriedTask = new PlayerTimeExpiredTask();
-
+            PlayerTimeExpiredTask wrongAnswer = new PlayerTimeExpiredTask();
+            wrongAnswer.run();
             enablePlayerButtons = false;
-            playerRespondTimer.cancel();
-
             return false;
         }
 
@@ -481,7 +482,6 @@ public class MainActivity extends AppCompatActivity
             // allows anchor tags to work
             TextView tv = (TextView) dialog.findViewById(android.R.id.message);
             tv.setMovementMethod(LinkMovementMethod.getInstance());
-
         }
     }
     /******************************************************************************************
