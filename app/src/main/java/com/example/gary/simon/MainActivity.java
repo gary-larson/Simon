@@ -1,14 +1,10 @@
 package com.example.gary.simon;
 
-import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
-import android.graphics.drawable.Drawable;
 import android.media.AudioAttributes;
 import android.media.SoundPool;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -62,15 +58,25 @@ public class MainActivity extends AppCompatActivity
     private int sound_tr_Id;
     private int buzzer_Id;
 
+    //countdown thread variables
     private CountDownTask countDownTask;
     private boolean delayCountDown = false;
     private final int [] countNumbers= {R.drawable.three1,R.drawable.two1,R.drawable.one1};
 
+    //players variables
+    private boolean enablePlayerButtons;      //flag disables players input until countdown is complete
+    private int checkAnswer= 0;
+    private NextRoundTask nextRoundTask;
+    private boolean check;
+    private int topScore= 0;
+    private int currentScore= 0;
+
     // Gameplay Variables
     private int[] simonSequence;
+    private int cycleThruSequence =0;
     private boolean isSimonsTurn = true;
     private int simonSeqCurrent = 0;
-    Random rand;
+    Random rand  = new Random();
 
 
     @Override
@@ -84,11 +90,12 @@ public class MainActivity extends AppCompatActivity
         //Initialize sequence Array
         simonSequence = new int[MAX_SEQ_LENGTH];
 
+
         // SoundPool variable initialization
         soundsLoaded = new HashSet<Integer>();
 
         // setup random generator
-        rand = new Random();
+        //rand = new Random();
 
         // Set up the listeners for the four buttons (all the same listener)
         ImageButton ib = (ImageButton) findViewById(R.id.topLeft_imageButton);
@@ -105,16 +112,19 @@ public class MainActivity extends AppCompatActivity
         // iDelay = BUTTON_DELAY_3;
 
         //set up the listener for countdown thread
-        Button b = (Button) findViewById(R.id.pause_button);
+        Button b = (Button) findViewById(R.id.newGame_button);
         b.setOnClickListener(this);
         //Set up listener for about button
         findViewById(R.id.about_button).setOnClickListener(new AboutApp());
 
-        // Test sequence for simons turn
-        for (int i = 0; i < 6; i++) {
-            simonSequence[i] = rand.nextInt(4) + 1;
-        }
+        setUpCurrentSequence();
 
+    }
+    /*******************************************************************************************
+    * Method creates simon sequence.
+    ****************************************************************************************** */
+    private void setUpCurrentSequence(){
+            simonSequence[simonSeqCurrent] = rand.nextInt(4) + 1;
     }
 
     private void playSimonSequence() {
@@ -125,6 +135,7 @@ public class MainActivity extends AppCompatActivity
     private void setImageButton(int dr) {
         ImageButton ib = (ImageButton) findViewById(iIb);
         ib.setImageResource (dr);
+
         if (timer == null) {
             timer = new Timer();
             timer.schedule(new ButtonTask(), iDelay);
@@ -137,12 +148,14 @@ public class MainActivity extends AppCompatActivity
         ib.setImageResource (dr);
         if (isSimonsTurn) {
             playSimonNext();
-        } else {
+        }
+
+        else {
             // start timer for player to respond
-            if (playerRespondTimer == null) {
+           if (playerRespondTimer == null) {
                 playerRespondTimer = new Timer();
                 playerRespondTimer.schedule(new PlayerTimeExpiredTask(), iDelay * PLAYER_RESPONSE_MULTIPLIER);
-            }
+           }
         }
     }
 
@@ -150,24 +163,28 @@ public class MainActivity extends AppCompatActivity
         if (simonSequence[simonSeqCurrent] > 0) {
             switch (simonSequence[simonSeqCurrent]) {
                 case 1:
+                    cycleThruSequence++;
                     iIb = R.id.topLeft_imageButton;
                     iDr = R.drawable.green_tl;
                     setImageButton(R.drawable.pressed_tl);
                     playSound(sound_tl_Id);
                     break;
                 case 2:
+                    cycleThruSequence++;
                     iIb = R.id.topRight_imageButton;
                     iDr = R.drawable.red_tr;
                     setImageButton(R.drawable.pressed_tr);
                     playSound(sound_tr_Id);
                     break;
                 case 3:
+                    cycleThruSequence++;
                     iIb = R.id.bottomLeft_imageButton;
                     iDr = R.drawable.yellow_bl;
                     setImageButton(R.drawable.pressed_bl);
                     playSound(sound_bl_Id);
                     break;
                 case 4:
+                    cycleThruSequence++;
                     iIb = R.id.bottomRight_imageButton;
                     iDr = R.drawable.cyan_br;
                     setImageButton(R.drawable.pressed_br);
@@ -182,6 +199,150 @@ public class MainActivity extends AppCompatActivity
                 playerRespondTimer = new Timer();
                 playerRespondTimer.schedule(new PlayerTimeExpiredTask(), iDelay * PLAYER_RESPONSE_MULTIPLIER);
             }
+        }
+    }
+    // method to handle button clicks if timer is running buttons are disabled
+    @Override
+    public void onClick(View v) {
+        //if statement disables player input into countdown thread is complete
+        if(enablePlayerButtons) {
+            if (timer == null) {
+                switch (v.getId()) {
+                    case R.id.topLeft_imageButton:
+                        // stop timer for player to respond
+                        iIb = R.id.topLeft_imageButton;
+                        iDr = R.drawable.green_tl;
+                        setImageButton(R.drawable.pressed_tl);
+                        playSound(sound_tl_Id);
+                        check = checkPlayerInPut(TOP_LEFT);
+                        break;
+                    case R.id.topRight_imageButton:
+                        // stop timer for player to respond
+                        iIb = R.id.topRight_imageButton;
+                        iDr = R.drawable.red_tr;
+                        setImageButton(R.drawable.pressed_tr);
+                        playSound(sound_tr_Id);
+                        check = checkPlayerInPut(TOP_RIGHT);
+                        break;
+                    case R.id.bottomLeft_imageButton:
+                        // stop timer for player to respond
+                        iIb = R.id.bottomLeft_imageButton;
+                        iDr = R.drawable.yellow_bl;
+                        setImageButton(R.drawable.pressed_bl);
+                        playSound(sound_bl_Id);
+                        check = checkPlayerInPut(BOTTOM_LEFT);
+                        break;
+                    case R.id.bottomRight_imageButton:
+                        // stop timer for player to respond
+                        iIb = R.id.bottomRight_imageButton;
+                        iDr = R.drawable.cyan_br;
+                        setImageButton(R.drawable.pressed_br);
+                        playSound(sound_br_Id);
+                        check = checkPlayerInPut(BOTTOM_RIGHT);
+                        break;
+                }
+            }
+
+            //Starts a new round if user answers enters correct sequence
+            checkAnswer ++;
+            if(check && checkAnswer >=simonSeqCurrent){
+                updateScore();
+                playerRespondTimer.cancel();
+                startNextRound();
+            }
+        }
+        if(v.getId() == R.id.newGame_button){
+            newGame();
+            Log.i("new Game", "newGame**********");
+        }
+
+    }
+    private void newGame(){
+        startCountdownGame();
+        resetCheckValues();
+    }
+    /*********************************************************************************************
+    * method will compare simons sequence to users input correct return true and start next round
+     * if not correct buzz and ask user to start new game.
+     *********************************************************************************************/
+    public boolean checkPlayerInPut(int input){
+        if(input == simonSequence[checkAnswer]){
+            return true;
+
+        }else {
+            PlayerTimeExpiredTask playerTimeExpriedTask = new PlayerTimeExpiredTask();
+
+            enablePlayerButtons = false;
+            playerRespondTimer.cancel();
+
+            return false;
+        }
+
+    }
+    /**************************************************************************************
+    * method updates score and top score
+     *************************************************************************************/
+    private void updateScore(){
+        TextView tv =(TextView)findViewById(R.id.score_textView);
+        currentScore = simonSeqCurrent;
+        tv.setText(String.valueOf(currentScore));
+
+        if(currentScore > topScore){
+            tv =(TextView) findViewById(R.id.topScore_textView);
+            topScore = currentScore;
+            tv.setText(String.valueOf(topScore));
+        }
+    }
+
+    // Callback method for the timer resets image and cancels timer Count is for debugging
+    class ButtonTask extends TimerTask {
+        @Override
+        public void run() {
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    resetImageButton(iDr);
+                    Log.i("ButtonTask", "-------------- " + count);
+                }
+            });
+            count++;
+            cancelButton();
+        }
+    }
+
+    private class PlayerTimeExpiredTask extends TimerTask {
+        @Override
+        public void run() {
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    playerOutOfTime();
+                    Log.i("PlayerExpiredTask", "-------------- AGAIN");
+                }
+            });
+            cancelPlayer();
+        }
+    }
+
+    // method to cancel timer
+    private void cancelButton() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+        //if statement will cancels countDown Thread and reset countDownTask to null -By Antonio Ramos
+        if(countDownTask != null) {
+            countDownTask.cancel(true);
+            countDownTask = null;
+        }
+    }
+    // Cancels player Respond Timer
+    private void cancelPlayer() {
+        if (playerRespondTimer != null) {
+            playerRespondTimer.cancel();
+            playerRespondTimer = null;
         }
     }
 
@@ -222,6 +383,8 @@ public class MainActivity extends AppCompatActivity
 
         //set delayCountDown to true to delay countdown thread to allow game time to set up
         delayCountDown=true;
+
+        resetCheckValues();
         startCountdownGame();
     }
 
@@ -238,37 +401,6 @@ public class MainActivity extends AppCompatActivity
             soundsLoaded.clear();
         }
     }
-
-    // method to cancel timer
-    private void cancelButton() {
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
-        }
-        //if statement will cancels countDown Thread and reset countDownTask to null -By Antonio Ramos
-        if(countDownTask != null) {
-            countDownTask.cancel(true);
-            countDownTask = null;
-        }
-    }
-
-    // Callback method for the timer resets image and cancels timer Count is for debugging
-    class ButtonTask extends TimerTask {
-        @Override
-        public void run() {
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    resetImageButton(iDr);
-                    Log.i("ButtonTask", "-------------- " + count);
-                }
-            });
-            count++;
-            cancelButton();
-        }
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -292,46 +424,7 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    // method to handle button clicks if timer is running buttons are disabled
-    @Override
-    public void onClick(View v) {
-        if (timer == null) {
-            switch (v.getId()) {
-                case R.id.topLeft_imageButton:
-                    // stop timer for player to respond
-                    iIb = R.id.topLeft_imageButton;
-                    iDr = R.drawable.green_tl;
-                    setImageButton(R.drawable.pressed_tl);
-                    playSound(sound_tl_Id);
-                    break;
-                case R.id.topRight_imageButton:
-                    // stop timer for player to respond
-                    iIb = R.id.topRight_imageButton;
-                    iDr = R.drawable.red_tr;
-                    setImageButton(R.drawable.pressed_tr);
-                    playSound(sound_tr_Id);
-                    break;
-                case R.id.bottomLeft_imageButton:
-                    // stop timer for player to respond
-                    iIb = R.id.bottomLeft_imageButton;
-                    iDr = R.drawable.yellow_bl;
-                    setImageButton(R.drawable.pressed_bl);
-                    playSound(sound_bl_Id);
-                    break;
-                case R.id.bottomRight_imageButton:
-                    // stop timer for player to respond
-                    iIb = R.id.bottomRight_imageButton;
-                    iDr = R.drawable.cyan_br;
-                    setImageButton(R.drawable.pressed_br);
-                    playSound(sound_br_Id);
-                    break;
 
-                case R.id.pause_button:
-                    startCountdownGame();
-                    break;
-            }
-        }
-    }
 
 
     // plays sound related to button
@@ -422,6 +515,8 @@ public class MainActivity extends AppCompatActivity
             super.onPreExecute();
             im.setVisibility(View.VISIBLE);
             layout.setBackgroundColor(0xffeb0404);
+            enablePlayerButtons = false;
+
         }
         //pause thread three times with one second interval.
         @Override
@@ -464,23 +559,10 @@ public class MainActivity extends AppCompatActivity
             rl.setBackgroundResource(R.drawable.background1);
             delayCountDown = false;
 
+            enablePlayerButtons = true;
+
             // added to start game
             playSimonSequence();
-        }
-    }
-
-    private class PlayerTimeExpiredTask extends TimerTask {
-        @Override
-        public void run() {
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    playerOutOfTime();
-                    Log.i("PlayerExpiredTask", "-------------- AGAIN");
-                }
-            });
-            cancelPlayer();
         }
     }
 
@@ -488,12 +570,42 @@ public class MainActivity extends AppCompatActivity
     private void playerOutOfTime() {
         playSound(buzzer_Id);
     }
+    private void resetCheckValues(){
+        checkAnswer =0;
+        cycleThruSequence =0;
+    }
 
-    // Cancels player Respond Timer
-    private void cancelPlayer() {
-        if (playerRespondTimer != null) {
-            playerRespondTimer.cancel();
-            playerRespondTimer = null;
+    private void startNextRound(){
+        nextRoundTask = new NextRoundTask();
+        nextRoundTask.execute();
+        resetCheckValues();
+    }
+    /********************************************************************************************
+    * class creates delay between rounds and starts next round
+     ****************************************************************************************/
+    class NextRoundTask extends AsyncTask<Void, Integer, Integer>{
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+        }
+        @Override
+        protected Integer doInBackground(Void... voids) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
+
+            setUpCurrentSequence();
+            playSimonSequence();
+
         }
     }
+
 }
