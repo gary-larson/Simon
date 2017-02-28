@@ -4,50 +4,6 @@
     android:layout_width="match_parent" android:layout_height="match_parent"
     android:background="@drawable/background1">
 
-    <Button
-        android:text="Button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/button4"
-        android:layout_alignBaseline="@+id/about_button"
-        android:layout_alignBottom="@+id/about_button"
-        android:layout_toEndOf="@+id/play_button"
-        android:background="#0C26C3"
-        android:textSize="30sp"
-        android:textColor="#ffffff"
-        android:textStyle="normal|bold"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp" />
-
-    <Button
-        android:text="@string/about"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/about_button"
-        android:textSize="30sp"
-        android:background="#FFF800"
-        android:textColor="#000000"
-        android:textStyle="normal|bold"
-        android:layout_below="@+id/play_button"
-        android:layout_toStartOf="@+id/button4"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp" />
-
-    <Button
-        android:text="@string/score"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/score_button"
-        android:textSize="30sp"
-        android:background="#E40000"
-        android:textColor="#ffffff"
-        android:textStyle="normal|bold"
-        android:paddingStart="18dp"
-        android:paddingEnd="16dp"
-        android:layout_alignBaseline="@+id/play_button"
-        android:layout_alignBottom="@+id/play_button"
-        android:layout_toEndOf="@+id/about_button" />
-
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -60,18 +16,98 @@
         android:layout_alignParentStart="true" />
 
     <Button
-        android:text="@string/play"
+        android:text=" PLAY "
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
         android:id="@+id/play_button"
-        android:textSize="30sp"
-        android:background="#00B600"
-        android:textColor="#ffffff"
         android:textStyle="normal|bold"
-        android:layout_marginStart="84dp"
-        android:paddingLeft="18dp"
-        android:paddingRight="18dp"
+        android:textColor="#ffffff"
+        android:textSize="36sp"
         android:layout_below="@+id/imageView"
+        android:layout_centerHorizontal="true"
+        android:background="#33d133"/>
+
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/gameInfo_button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp"
+        android:background="#A40076"
+        android:paddingRight="5dp"
+        android:id="@+id/game_mode">
+
+        <RadioButton
+            android:text="One Player"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/one_radioButton"
+            android:layout_weight="1"
+            android:textSize="30sp"
+            android:textColor="#ffffff"
+            android:textStyle="normal|bold" />
+
+        <RadioButton
+            android:text="Two vs Simon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/two_radioButton"
+            android:layout_weight="1"
+            android:textColor="#ffffff"
+            android:textStyle="normal|bold"
+            android:textSize="30sp" />
+
+        <RadioButton
+            android:text="Insane"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/insane_radioButton"
+            android:layout_weight="1"
+            android:textSize="30sp"
+            android:textStyle="normal|bold"
+            android:textColor="#ffffff"
+            android:fontFamily="sans-serif" />
+    </RadioGroup>
+
+    <Button
+        android:text=" ABOUT "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/about_button"
+        android:textSize="36sp"
+        android:textColor="#ffffff"
+        android:background="#eb0404"
+        android:layout_below="@+id/play_button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:textStyle="normal|bold" />
+
+    <Button
+        android:text=" Top Score "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/score_button"
+        android:textSize="36sp"
+        android:textColor="#000000"
+        android:background="#fffd15"
+        android:layout_below="@+id/about_button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:textStyle="normal|bold" />
+
+    <Button
+        android:text=" Instructions "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/gameInfo_button"
+        android:textSize="36sp"
+        android:textColor="#ffffff"
+        android:background="#0A39A6"
+        android:textStyle="normal|bold"
+        android:layout_marginTop="11dp"
+        android:layout_below="@+id/score_button"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="120dp" />
+        android:layout_marginStart="55dp" />
+
 </RelativeLayout>
