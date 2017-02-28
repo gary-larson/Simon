@@ -1,5 +1,6 @@
 package com.example.gary.simon;
 
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.media.AudioAttributes;
 import android.media.SoundPool;
@@ -19,9 +20,19 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -78,6 +89,11 @@ public class MainActivity extends AppCompatActivity
     private int simonSeqCurrent = 0;
     Random rand  = new Random();
 
+    private static final String DATA_FILENAME = "simon.txt";
+
+    //Variable is used to select game mode
+    private int gameMode;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,17 +130,83 @@ public class MainActivity extends AppCompatActivity
         //set up the listener for countdown thread
         Button b = (Button) findViewById(R.id.newGame_button);
         b.setOnClickListener(this);
-        //Set up listener for about button
-        findViewById(R.id.about_button).setOnClickListener(new AboutApp());
 
+        // test if instance was not restored initialize game and check for saved game added by Gary
+        if (savedInstanceState == null) {
+            readData();
+            TextView tv = (TextView)findViewById(R.id.topScore_textView);
+            tv.setText(String.valueOf(topScore));
+        }
         setUpCurrentSequence();
 
+    }
+
+    // read game state from file added by Gary
+    private void readData() {
+
+        try {
+            // Log.i("INFO", "---------- Entered Read");
+            FileInputStream fis = openFileInput(DATA_FILENAME);
+            Scanner scanner = new Scanner(fis);
+
+            // Log.i("INFO", "---------- Read Setup Done");
+            if (scanner.hasNext()) {
+                // Log.i("INFO", "---------- Read has DATA");
+                int i;
+                //simonSeqCurrent = scanner.nextInt();
+                topScore = scanner.nextInt();
+                simonSeqCurrent = scanner.nextInt();
+                for (i = 0; i < simonSeqCurrent; i++)
+                    simonSequence[i] = scanner.nextInt();
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            // Log.i("INFO", "---------- Read Exception");
+            // ok if file does not exist
+        }
+    }
+    // call method to save game state to file added by Gary
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Log.i("INFO", "---------- Write CALLED");
+        writeData();
+    }
+    // write game state to file added by Gary
+    private void writeData() {
+
+        try {
+            // Log.i("INFO", "---------- Entered Write");
+            FileOutputStream fos = openFileOutput(DATA_FILENAME, Context.MODE_PRIVATE);
+            OutputStreamWriter osw = new OutputStreamWriter(fos);
+            BufferedWriter bw = new BufferedWriter(osw);
+            PrintWriter pw = new PrintWriter(bw);
+            int i;
+            // Log.i("INFO", "---------- Write Setup Complete");
+
+            //pw.println(simonSeqCurrent);
+            pw.println(topScore);
+            pw.println(simonSeqCurrent);
+            for (i = 0; i < simonSeqCurrent; i++)
+                pw.println(simonSequence[i]);
+            Log.i("count", "**********************"+ simonSequence[i]+ "** "+simonSeqCurrent );
+
+            // Log.i("INFO", "---------- Write DATA COMPLETE");
+
+            pw.close();
+        } catch (FileNotFoundException e) {
+            // Log.e("WRITE_ERR", "Cannot save data: " + e.getMessage());
+            e.printStackTrace();
+            Toast.makeText(this, "Error saving data", Toast.LENGTH_SHORT).show();
+        }
     }
     /*******************************************************************************************
     * Method creates simon sequence.
     ****************************************************************************************** */
     private void setUpCurrentSequence(){
-        // simonSequence[simonSeqCurrent] = rand.nextInt(4) + 1;
+
+        simonSequence[simonSeqCurrent] = rand.nextInt(4) + 1;
+       /*
         simonSequence[simonSeqCurrent] = 1;
         simonSeqCurrent++;
         simonSequence[simonSeqCurrent] = 2;
@@ -132,10 +214,12 @@ public class MainActivity extends AppCompatActivity
         simonSequence[simonSeqCurrent] = 3;
         simonSeqCurrent++;
         simonSequence[simonSeqCurrent] = 4;
-        simonSeqCurrent++;
+simonSeqCurrent++;
+        */simonSeqCurrent++;
     }
 
     private void playSimonSequence() {
+        isSimonsTurn = true;
         cycleThruSequence = 0;
         playSimonNext();
     }
@@ -200,7 +284,7 @@ public class MainActivity extends AppCompatActivity
                     playSound(sound_br_Id);
                     break;
             }
-            // simonSeqCurrent++; removed by Gary
+             //simonSeqCurrent++; //removed by Gary
         } else {
             isSimonsTurn = false;
             // start timer for player to respond disabled for troubleshooting
@@ -267,16 +351,22 @@ public class MainActivity extends AppCompatActivity
 
     }
     /**********************************************************************************************
-    * new game will reset current score and start new game
+    * new game will reset current score and start new game- By Antonio Ramos
      *********************************************************************************************/
     private void newGame(){
+        for(int i =0; i<simonSeqCurrent; i++){
+            simonSequence[i] =0;
+        }
         TextView tv =(TextView) findViewById(R.id.score_textView);
         tv.setText(String.valueOf(0));
          tv = (TextView)findViewById(R.id.gameOver_textview);
         tv.setText("");
         simonSeqCurrent=0;
-        startCountdownGame();
         resetCheckValues();
+        isSimonsTurn = true;
+        setUpCurrentSequence();
+        startCountdownGame();
+
     }
     /*********************************************************************************************
     * method will compare Simon's sequence to users input correct return true and start next round
@@ -285,19 +375,31 @@ public class MainActivity extends AppCompatActivity
     public boolean checkPlayerInPut(int input){
         if(input == simonSequence[checkAnswer]){
             return true;
-
         }else {
-            PlayerTimeExpiredTask wrongAnswer = new PlayerTimeExpiredTask();
-            wrongAnswer.run();
-            TextView tv = (TextView)findViewById(R.id.gameOver_textview);
-            tv.setText("GAME OVER!!");
-            enablePlayerButtons = false;
+            gameOver();
             return false;
         }
-
+    }
+    /*********************************************************************************************
+     * method will clear game data from variables, display game over message, enablePlayer
+     * button and reset timers/threads
+     *********************************************************************************************/
+    private void gameOver(){
+        for(int i =0; i<simonSeqCurrent; i++){
+            simonSequence[i] =0;
+        }
+        simonSeqCurrent=0;
+        resetCheckValues();
+        cancelPlayer();
+        isSimonsTurn = false;
+        playSound(buzzer_Id);
+        if(nextRoundTask != null){
+            nextRoundTask = null;
+        }
+        gameOverTitle();
     }
     /**************************************************************************************
-    * method updates score and top score
+    * method updates and display current score and top score.
      *************************************************************************************/
     private void updateScore(){
         TextView tv =(TextView)findViewById(R.id.score_textView);
@@ -310,6 +412,9 @@ public class MainActivity extends AppCompatActivity
             tv.setText(String.valueOf(topScore));
         }
     }
+    /**************************************************************************************
+     * method display game over message and enables player's buttons
+     *************************************************************************************/
     private void gameOverTitle(){
         enablePlayerButtons = false;
         TextView tv = (TextView)findViewById(R.id.gameOver_textview);
@@ -342,6 +447,7 @@ public class MainActivity extends AppCompatActivity
                     playerOutOfTime();
                     Log.i("PlayerExpiredTask", "-------------- AGAIN");
                     gameOverTitle();
+                    gameOver();
                 }
             });
             cancelPlayer();
@@ -370,8 +476,6 @@ public class MainActivity extends AppCompatActivity
         }
 
     }
-
-
     // use onResume to setup SoundPool
     @Override
     protected void onResume() {
@@ -417,6 +521,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
+        writeData();
         cancelButton();
         cancelPlayer();
         if (soundpool != null) {
@@ -426,6 +531,11 @@ public class MainActivity extends AppCompatActivity
             soundsLoaded.clear();
         }
     }
+
+    /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                            LOOK AT
+          if we dont need lets get rid of onCreateOptionsMenu,onOptionsItemSelected
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -449,9 +559,6 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-
-
-
     // plays sound related to button
     private void playSound (int iSound) {
         if (soundsLoaded.contains(iSound)) {
@@ -460,54 +567,6 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    /******************************************************************************************
-     * Class creates alertDialog to display apps' information about the developers and
-     * credits to all sounds and images used.-By Antonio Ramos
-     *****************************************************************************************/
-    class AboutApp implements View.OnClickListener{
-        @Override
-        public void onClick(View view){
-            String message = "<html>"+
-                    "<h2>About App</h2>" +
-                    "<p><b>Programmers: </b>Gary Larson And Antonio Ramos <br>"+
-                    "<h2>Sounds</h2>" +
-                    "<b>Source:</b>Sound associated with Simon's Button Image<br>" +
-                    "<b>Creator:</b>Simon Dalzell<br>" +
-                    "<b>Description:</b>Organ - quiet - A4 (NT5_Man3Quiet_155_rr1.wav)<br>" +
-                    "<b>Link: </b> <a href='http://www.freesound.org/people/Samulis/sounds/373717/'>source website</a><br>" +
-                    "<b>Description:</b>Organ - quiet - C4 (NT5_Man3Quiet_146_rr1.wav)<br>" +
-                    "<b>Link: </b> <a href='http://www.freesound.org/people/Samulis/sounds/373714/'>source website</a><br>" +
-                    "<b>Description:</b>Organ - quiet - D#4 (NT5_Man3Quiet_149_rr1.wav)<br>" +
-                    "<b>Link: </b> <a href='http://www.freesound.org/people/Samulis/sounds/373715/'>source website</a><br>" +
-                    "<b>Description:</b>Organ - quiet - F4 (NT5_Man3Quiet_152_rr1.wav)<br>" +
-                    "<b>Link: </b> <a href='http://www.freesound.org/people/Samulis/sounds/373716/'>source website</a><br>" +
-                    "<b>License: </b> Creative Commons 0<br>" +
-                    "<b>Source:</b>Sound to alert player time is up<br>" +
-                    "<b>Creator:</b>hypocore<br>" +
-                    "<b>Description:</b>Buzzer<br>" +
-                    "<b>Link: </b> <a href='http://www.freesound.org/people/hypocore/sounds/164090/'>source website</a><br>" +
-                    "<h2>Images </h2>" +
-                    "<b>Source:</b> Background Image <br>" +
-                    "<b>Creator:</b> Viscious-Speed <br>" +
-                    "<b>Link: </b> <a href='http://openclipart.org/detail/173820/" +
-                    "colourful-abstract-background/content/space-boss-battle-theme'>" +
-                    "source website</a><br>" +
-                    "<b>License: </b> ?" +
-
-                    "</p></html>";
-            AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-            builder.setMessage(Html.fromHtml(message));
-            builder.setPositiveButton("OK", null);
-
-            AlertDialog dialog = builder.create();
-            dialog.show();
-
-            // must be done after the call to show();
-            // allows anchor tags to work
-            TextView tv = (TextView) dialog.findViewById(android.R.id.message);
-            tv.setMovementMethod(LinkMovementMethod.getInstance());
-        }
-    }
     /******************************************************************************************
      * Method activates countdown thread to give user time to get ready before game begin/resumes.
      * If countdown thread is activate method prevents user from calling countdown thread until
@@ -603,23 +662,20 @@ public class MainActivity extends AppCompatActivity
         nextRoundTask = new NextRoundTask();
         nextRoundTask.execute();
         resetCheckValues();
-        isSimonsTurn = true;
-      //  setUpCurrentSequence(); for debugging
+       // isSimonsTurn = true;
+
+       // setUpCurrentSequence(); //for debugging
       //  playSimonSequence();      for debugging
     }
     /********************************************************************************************
     * class creates delay between rounds and starts next round
      ****************************************************************************************/
-    class NextRoundTask extends AsyncTask<Void, Integer, Integer>{
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-        }
+    class NextRoundTask extends AsyncTask<Void, Void, Integer>{
         @Override
         protected Integer doInBackground(Void... voids) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(1000);
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -628,7 +684,6 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
-
             setUpCurrentSequence();
             playSimonSequence();
 
