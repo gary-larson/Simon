@@ -124,9 +124,9 @@ public class MainActivity extends AppCompatActivity
     * Method creates simon sequence.
     ****************************************************************************************** */
     private void setUpCurrentSequence(){
-            // simonSequence[simonSeqCurrent] = rand.nextInt(4) + 1;
-            simonSequence[simonSeqCurrent] = 1;
-            simonSeqCurrent++;
+        // simonSequence[simonSeqCurrent] = rand.nextInt(4) + 1;
+        simonSequence[simonSeqCurrent] = 1;
+        simonSeqCurrent++;
         simonSequence[simonSeqCurrent] = 2;
         simonSeqCurrent++;
         simonSequence[simonSeqCurrent] = 3;
@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity
 
         else {
             // start timer for player to respond
-           if (playerRespondTimer == null) {
+           if (playerRespondTimer == null && checkAnswer >= simonSeqCurrent) {
                 playerRespondTimer = new Timer();
                 playerRespondTimer.schedule(new PlayerTimeExpiredTask(), iDelay * PLAYER_RESPONSE_MULTIPLIER);
            }
@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity
             // simonSeqCurrent++; removed by Gary
         } else {
             isSimonsTurn = false;
-            // start timer for player to respond
+            // start timer for player to respond disabled for troubleshooting
             if (playerRespondTimer == null) {
                 playerRespondTimer = new Timer();
                 playerRespondTimer.schedule(new PlayerTimeExpiredTask(), iDelay * PLAYER_RESPONSE_MULTIPLIER);
@@ -256,7 +256,7 @@ public class MainActivity extends AppCompatActivity
             checkAnswer ++;
             if(check && checkAnswer >=simonSeqCurrent){
                 updateScore();
-                playerRespondTimer.cancel();
+                //playerRespondTimer.cancel(); Removed by Gary
                 startNextRound();
             }
         }
@@ -603,6 +603,9 @@ public class MainActivity extends AppCompatActivity
         nextRoundTask = new NextRoundTask();
         nextRoundTask.execute();
         resetCheckValues();
+        isSimonsTurn = true;
+      //  setUpCurrentSequence(); for debugging
+      //  playSimonSequence();      for debugging
     }
     /********************************************************************************************
     * class creates delay between rounds and starts next round
