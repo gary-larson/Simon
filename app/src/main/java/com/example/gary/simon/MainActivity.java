@@ -124,10 +124,19 @@ public class MainActivity extends AppCompatActivity
     * Method creates simon sequence.
     ****************************************************************************************** */
     private void setUpCurrentSequence(){
-            simonSequence[simonSeqCurrent] = rand.nextInt(4) + 1;
+            // simonSequence[simonSeqCurrent] = rand.nextInt(4) + 1;
+            simonSequence[simonSeqCurrent] = 1;
+            simonSeqCurrent++;
+        simonSequence[simonSeqCurrent] = 2;
+        simonSeqCurrent++;
+        simonSequence[simonSeqCurrent] = 3;
+        simonSeqCurrent++;
+        simonSequence[simonSeqCurrent] = 4;
+        simonSeqCurrent++;
     }
 
     private void playSimonSequence() {
+        cycleThruSequence = 0;
         playSimonNext();
     }
 
@@ -160,8 +169,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void playSimonNext() {
-        if (simonSequence[simonSeqCurrent] > 0) {
-            switch (simonSequence[simonSeqCurrent]) {
+        if (simonSequence[cycleThruSequence] > 0) {
+            switch (simonSequence[cycleThruSequence]) {
                 case 1:
                     cycleThruSequence++;
                     iIb = R.id.topLeft_imageButton;
@@ -191,7 +200,7 @@ public class MainActivity extends AppCompatActivity
                     playSound(sound_br_Id);
                     break;
             }
-            simonSeqCurrent++;
+            // simonSeqCurrent++; removed by Gary
         } else {
             isSimonsTurn = false;
             // start timer for player to respond
@@ -209,7 +218,7 @@ public class MainActivity extends AppCompatActivity
             if (timer == null) {
                 switch (v.getId()) {
                     case R.id.topLeft_imageButton:
-                        // stop timer for player to respond
+                        cancelPlayer();     // stop timer for player to respond
                         iIb = R.id.topLeft_imageButton;
                         iDr = R.drawable.green_tl;
                         setImageButton(R.drawable.pressed_tl);
@@ -217,7 +226,7 @@ public class MainActivity extends AppCompatActivity
                         check = checkPlayerInPut(TOP_LEFT);
                         break;
                     case R.id.topRight_imageButton:
-                        // stop timer for player to respond
+                        cancelPlayer();     // stop timer for player to respond
                         iIb = R.id.topRight_imageButton;
                         iDr = R.drawable.red_tr;
                         setImageButton(R.drawable.pressed_tr);
@@ -225,7 +234,7 @@ public class MainActivity extends AppCompatActivity
                         check = checkPlayerInPut(TOP_RIGHT);
                         break;
                     case R.id.bottomLeft_imageButton:
-                        // stop timer for player to respond
+                        cancelPlayer();     // stop timer for player to respond
                         iIb = R.id.bottomLeft_imageButton;
                         iDr = R.drawable.yellow_bl;
                         setImageButton(R.drawable.pressed_bl);
@@ -233,7 +242,7 @@ public class MainActivity extends AppCompatActivity
                         check = checkPlayerInPut(BOTTOM_LEFT);
                         break;
                     case R.id.bottomRight_imageButton:
-                        // stop timer for player to respond
+                        cancelPlayer();     // stop timer for player to respond
                         iIb = R.id.bottomRight_imageButton;
                         iDr = R.drawable.cyan_br;
                         setImageButton(R.drawable.pressed_br);
