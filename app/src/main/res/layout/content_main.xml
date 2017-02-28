@@ -139,4 +139,15 @@
         android:layout_above="@+id/about_button"
         android:layout_centerHorizontal="true"
         android:textStyle="normal|bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/switch_textview"
+        android:textStyle="normal|bold|italic"
+        android:textSize="40sp"
+        android:textColor="#ffffff"
+        android:background="#0019ff"
+        android:layout_below="@+id/textView3"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>

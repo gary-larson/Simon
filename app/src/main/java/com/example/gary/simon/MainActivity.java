@@ -92,7 +92,8 @@ public class MainActivity extends AppCompatActivity
     private static final String DATA_FILENAME = "simon.txt";
 
     //Variable is used to select game mode
-    private int gameMode;
+    private int gameMode =2;
+
 
 
     @Override
@@ -219,7 +220,7 @@ simonSeqCurrent++;
     }
 
     private void playSimonSequence() {
-        isSimonsTurn = true;
+       // isSimonsTurn = true;
         cycleThruSequence = 0;
         playSimonNext();
     }
@@ -340,7 +341,6 @@ simonSeqCurrent++;
             checkAnswer ++;
             if(check && checkAnswer >=simonSeqCurrent){
                 updateScore();
-                //playerRespondTimer.cancel(); Removed by Gary
                 startNextRound();
             }
         }
@@ -574,13 +574,15 @@ simonSeqCurrent++;
      *****************************************************************************************/
     public void startCountdownGame(){
 
-        if(countDownTask != null && countDownTask.getStatus() == AsyncTask.Status.FINISHED){
+        if (countDownTask != null && countDownTask.getStatus() == AsyncTask.Status.FINISHED) {
             countDownTask = null;
+            Log.i("countDownTask","*****************NULL********");
         }
+
         if(countDownTask == null) {
             countDownTask = new CountDownTask();
             countDownTask.execute();
-            Log.i("onClick", "inside onClick***************");
+
         }
     }
     /******************************************************************************************
@@ -591,14 +593,16 @@ simonSeqCurrent++;
     class CountDownTask extends AsyncTask<Void, Integer, Integer>{
         ImageView im = (ImageView) findViewById(R.id.count);
         View layout = findViewById(R.id.content_main);
+        TextView tv = (TextView)findViewById(R.id.switch_textview);
 
         //preset-up will make count imageView visible and change background color to red
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            enablePlayerButtons = false;
             im.setVisibility(View.VISIBLE);
             layout.setBackgroundColor(0xffeb0404);
-            enablePlayerButtons = false;
+
 
         }
         //pause thread three times with one second interval.
@@ -641,11 +645,13 @@ simonSeqCurrent++;
             im.setVisibility(View.INVISIBLE);
             rl.setBackgroundResource(R.drawable.background1);
             delayCountDown = false;
-
             enablePlayerButtons = true;
 
-            // added to start game
-            playSimonSequence();
+                // added to start game
+                playSimonSequence();
+
+
+
         }
     }
 
@@ -660,8 +666,10 @@ simonSeqCurrent++;
 
     private void startNextRound(){
         nextRoundTask = new NextRoundTask();
-        nextRoundTask.execute();
         resetCheckValues();
+        nextRoundTask.execute();
+
+
        // isSimonsTurn = true;
 
        // setUpCurrentSequence(); //for debugging
@@ -671,9 +679,11 @@ simonSeqCurrent++;
     * class creates delay between rounds and starts next round
      ****************************************************************************************/
     class NextRoundTask extends AsyncTask<Void, Void, Integer>{
+
         @Override
         protected Integer doInBackground(Void... voids) {
             try {
+
                 Thread.sleep(1000);
 
             } catch (InterruptedException e) {
@@ -681,12 +691,16 @@ simonSeqCurrent++;
             }
             return null;
         }
+
         @Override
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
-            setUpCurrentSequence();
-            playSimonSequence();
 
+                setUpCurrentSequence();
+            if(gameMode !=  2 ){
+
+            } isSimonsTurn = true;
+                playSimonSequence();
         }
     }
 
