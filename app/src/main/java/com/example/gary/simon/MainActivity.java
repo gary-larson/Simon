@@ -257,12 +257,20 @@ public class MainActivity extends AppCompatActivity
         }
 
     }
+    /**********************************************************************************************
+    * new game will reset current score and start new game
+     *********************************************************************************************/
     private void newGame(){
+        TextView tv =(TextView) findViewById(R.id.score_textView);
+        tv.setText(String.valueOf(0));
+         tv = (TextView)findViewById(R.id.gameOver_textview);
+        tv.setText("");
+        simonSeqCurrent=0;
         startCountdownGame();
         resetCheckValues();
     }
     /*********************************************************************************************
-    * method will compare simons sequence to users input correct return true and start next round
+    * method will compare Simon's sequence to users input correct return true and start next round
      * if not correct buzz and ask user to start new game.
      *********************************************************************************************/
     public boolean checkPlayerInPut(int input){
@@ -270,11 +278,11 @@ public class MainActivity extends AppCompatActivity
             return true;
 
         }else {
-            PlayerTimeExpiredTask playerTimeExpriedTask = new PlayerTimeExpiredTask();
-
+            PlayerTimeExpiredTask wrongAnswer = new PlayerTimeExpiredTask();
+            wrongAnswer.run();
+            TextView tv = (TextView)findViewById(R.id.gameOver_textview);
+            tv.setText("GAME OVER!!");
             enablePlayerButtons = false;
-            playerRespondTimer.cancel();
-
             return false;
         }
 
@@ -293,7 +301,11 @@ public class MainActivity extends AppCompatActivity
             tv.setText(String.valueOf(topScore));
         }
     }
-
+    private void gameOverTitle(){
+        enablePlayerButtons = false;
+        TextView tv = (TextView)findViewById(R.id.gameOver_textview);
+        tv.setText("GAME OVER!!");
+    }
     // Callback method for the timer resets image and cancels timer Count is for debugging
     class ButtonTask extends TimerTask {
         @Override
@@ -320,10 +332,13 @@ public class MainActivity extends AppCompatActivity
                 public void run() {
                     playerOutOfTime();
                     Log.i("PlayerExpiredTask", "-------------- AGAIN");
+                    gameOverTitle();
                 }
             });
             cancelPlayer();
+           // gameOverTitle();
         }
+
     }
 
     // method to cancel timer
@@ -344,6 +359,7 @@ public class MainActivity extends AppCompatActivity
             playerRespondTimer.cancel();
             playerRespondTimer = null;
         }
+
     }
 
 
@@ -481,7 +497,6 @@ public class MainActivity extends AppCompatActivity
             // allows anchor tags to work
             TextView tv = (TextView) dialog.findViewById(android.R.id.message);
             tv.setMovementMethod(LinkMovementMethod.getInstance());
-
         }
     }
     /******************************************************************************************
