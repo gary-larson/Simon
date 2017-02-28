@@ -128,4 +128,15 @@
         android:layout_alignBottom="@+id/about_button"
         android:layout_alignEnd="@+id/bottomRight_imageButton"
         android:id="@+id/newGame_button" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        android:id="@+id/gameOver_textview"
+        android:textColor="#ffffff"
+        android:textSize="40sp"
+        android:layout_above="@+id/about_button"
+        android:layout_centerHorizontal="true"
+        android:textStyle="normal|bold" />
 </RelativeLayout>
