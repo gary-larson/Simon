@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity
     private int[] simonSequence;
     private int cycleThruSequence =0;
     private boolean isSimonsTurn = true;
+    private boolean isGameOver = false;
     private int simonSeqCurrent = 0;
     private Random rand  = new Random();
 
@@ -219,21 +220,25 @@ public class MainActivity extends AppCompatActivity
     * Method creates simon sequence.
     ****************************************************************************************** */
     private void setUpCurrentSequence(){
-        if (gameMode == 3) {
-            for (int i = 0; i < simonSeqCurrent; i++) {
-                simonSequence[i] = rand.nextInt(4) + 1;
+        if (!isGameOver) {
+            if (gameMode == 3) {
+                for (int i = 0; i < simonSeqCurrent; i++) {
+                    simonSequence[i] = rand.nextInt(4) + 1;
+                }
             }
+
+            simonSequence[simonSeqCurrent] = rand.nextInt(4) + 1;
+
+            simonSeqCurrent++;
         }
-
-        simonSequence[simonSeqCurrent] = rand.nextInt(4) + 1;
-
-        simonSeqCurrent++;
     }
 
     private void playSimonSequence() {
        // isSimonsTurn = true;
-        cycleThruSequence = 0;
-        playSimonNext();
+        if (!isGameOver) {
+            cycleThruSequence = 0;
+            playSimonNext();
+        }
     }
 
     // method to change image to pressed image and start the timer
@@ -257,7 +262,7 @@ public class MainActivity extends AppCompatActivity
 
         else {
             // start timer for player to respond
-           if (playerRespondTimer == null && check) {
+           if (playerRespondTimer == null && check && !isSimonsTurn && !isGameOver) {
                 playerRespondTimer = new Timer();
                 playerRespondTimer.schedule(new PlayerTimeExpiredTask(), BUTTON_DELAY_1 * PLAYER_RESPONSE_MULTIPLIER);
                playerCount++;
@@ -317,54 +322,67 @@ public class MainActivity extends AppCompatActivity
     public void onClick(View v) {
         //if statement disables player input into countdown thread is complete
         if(enablePlayerButtons) {
-            if (timer == null && !isSimonsTurn) {
+            if (timer == null ) {
                 switch (v.getId()) {
                     case R.id.topLeft_imageButton:
                        // Log.i("Status", "Call Cancel #1 onClick tl");
                         cancelPlayer();     // stop timer for player to respond
                         iIb = R.id.topLeft_imageButton;
                         iDr = R.drawable.green_tl;
-                        setImageButton(R.drawable.pressed_tl);
-                        playSound(sound_tl_Id);
                         check = checkPlayerInPut(TOP_LEFT);
+                        if (check) {
+                            setImageButton(R.drawable.pressed_tl);
+                            playSound(sound_tl_Id);
+                        }
                         break;
                     case R.id.topRight_imageButton:
                        // Log.i("Status", "Call Cancel #2 onClick tr");
                         cancelPlayer();     // stop timer for player to respond
                         iIb = R.id.topRight_imageButton;
                         iDr = R.drawable.red_tr;
-                        setImageButton(R.drawable.pressed_tr);
-                        playSound(sound_tr_Id);
                         check = checkPlayerInPut(TOP_RIGHT);
+                        if (check) {
+                            setImageButton(R.drawable.pressed_tr);
+                            playSound(sound_tr_Id);
+                        }
                         break;
                     case R.id.bottomLeft_imageButton:
                        // Log.i("Status", "Call Cancel #3 onClick bl");
                         cancelPlayer();     // stop timer for player to respond
                         iIb = R.id.bottomLeft_imageButton;
                         iDr = R.drawable.yellow_bl;
-                        setImageButton(R.drawable.pressed_bl);
-                        playSound(sound_bl_Id);
                         check = checkPlayerInPut(BOTTOM_LEFT);
+                        if (check) {
+                            setImageButton(R.drawable.pressed_bl);
+                            playSound(sound_bl_Id);
+                        }
                         break;
                     case R.id.bottomRight_imageButton:
                        // Log.i("Status", "Call Cancel #4 onClick br");
                         cancelPlayer();     // stop timer for player to respond
                         iIb = R.id.bottomRight_imageButton;
                         iDr = R.drawable.cyan_br;
-                        setImageButton(R.drawable.pressed_br);
-                        playSound(sound_br_Id);
                         check = checkPlayerInPut(BOTTOM_RIGHT);
+                        if (check) {
+                            setImageButton(R.drawable.pressed_br);
+                            playSound(sound_br_Id);
+                        }
                         break;
+                    }
+                } else {
+                    gameOver();
                 }
-            }
 
-            //Starts a new round if user answers enters correct sequence
-            checkAnswer ++;
-            if(check && checkAnswer >=simonSeqCurrent){
-                updateScore();
-                cancelPlayer();
-                startNextRound();
-            }
+
+                //Starts a new round if user answers enters correct sequence
+                checkAnswer ++;
+                if(check && checkAnswer >=simonSeqCurrent){
+                    updateScore();
+                    cancelPlayer();
+                    startNextRound();
+                }
+            } else {
+            gameOver();
         }
         if(v.getId() == R.id.newGame_button){
             newGame();
@@ -376,6 +394,7 @@ public class MainActivity extends AppCompatActivity
     * new game will reset current score and start new game- By Antonio Ramos
      *********************************************************************************************/
     private void newGame(){
+        cancelPlayer();
         for(int i =0; i<simonSeqCurrent; i++){
             simonSequence[i] =0;
         }
@@ -386,6 +405,7 @@ public class MainActivity extends AppCompatActivity
         simonSeqCurrent=0;
         resetCheckValues();
         isSimonsTurn = true;
+        isGameOver = false;
         cancelPlayer();
         setUpCurrentSequence();
         startCountdownGame();
@@ -414,11 +434,12 @@ public class MainActivity extends AppCompatActivity
         }
         simonSeqCurrent=0;
         resetCheckValues();
+        playSound(buzzer_Id);
+        isGameOver = true;
        // cancelButton();
        // Log.i("Status", "Call Cancel #5 gameOver");
 
         isSimonsTurn = false;
-        playSound(buzzer_Id);
         if(nextRoundTask != null){
             nextRoundTask = null;
         }
@@ -592,7 +613,7 @@ public class MainActivity extends AppCompatActivity
 
     // plays sound related to button
     private void playSound (int iSound) {
-        if (soundsLoaded.contains(iSound)) {
+        if (soundsLoaded.contains(iSound) && !isGameOver) {
             soundpool.play(iSound, 1.0f, 1.0f, 0, 0, (float) iDelay / (float) BUTTON_DELAY_1);
         }
     }

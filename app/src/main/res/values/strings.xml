@@ -13,7 +13,7 @@
     <string name="Instructions_1">Normal operation is to copy the button sequence Simon plays.
         Simon\'s button sequence will be the same but add one button each turn.
         If you take too long to respond the game will be over.
-        If you get the button sequence wrong the game will be over.
+        If you get the button sequence wrong or press an active button the game will be over.
         If you finish the button sequence of 90 buttons you finish the level.
         Variation Fast is the same as above except faster it is worth 2 times the points than normal.
         Variation Insane is the fastest and the entire button sequence changes and one is added.
