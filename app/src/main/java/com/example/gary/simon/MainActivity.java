@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity
     private Timer playerRespondTimer;
     // iIb is current ImageButton, iDr is current Drawable, iDelay is current speed of the game
     private int iIb, iDr, iDelay = BUTTON_DELAY_1;
-    private int count = 0;
+    private int count = 0, playerCount = 0;
 
     //Soundpool Variables
     private SoundPool soundpool;
@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity
             pw.println(simonSeqCurrent);
             for (i = 0; i < simonSeqCurrent; i++)
                 pw.println(simonSequence[i]);
-            Log.i("count", "**********************"+ simonSequence[i]+ "** "+simonSeqCurrent );
+            // Log.i("count", "**********************"+ simonSequence[i]+ "** "+simonSeqCurrent );
 
             // Log.i("INFO", "---------- Write DATA COMPLETE");
 
@@ -246,9 +246,13 @@ simonSeqCurrent++;
 
         else {
             // start timer for player to respond
-           if (playerRespondTimer == null && checkAnswer >= simonSeqCurrent) {
+           if (playerRespondTimer == null) {
                 playerRespondTimer = new Timer();
                 playerRespondTimer.schedule(new PlayerTimeExpiredTask(), iDelay * PLAYER_RESPONSE_MULTIPLIER);
+               playerCount++;
+               // Log.i("STATUS", "Reset PLAYER TIMER " + playerCount );
+           //} else {
+              // Log.i("STATUS", "Reset PLAYER TIMER not fired NOT NULL");
            }
         }
     }
@@ -292,6 +296,8 @@ simonSeqCurrent++;
             if (playerRespondTimer == null) {
                 playerRespondTimer = new Timer();
                 playerRespondTimer.schedule(new PlayerTimeExpiredTask(), iDelay * PLAYER_RESPONSE_MULTIPLIER);
+                playerCount++;
+               // Log.i("STATUS", "PlaySimon PLAYER TIMER " + playerCount );
             }
         }
     }
@@ -303,6 +309,7 @@ simonSeqCurrent++;
             if (timer == null) {
                 switch (v.getId()) {
                     case R.id.topLeft_imageButton:
+                       // Log.i("Status", "Call Cancel #1 onClick tl");
                         cancelPlayer();     // stop timer for player to respond
                         iIb = R.id.topLeft_imageButton;
                         iDr = R.drawable.green_tl;
@@ -311,6 +318,7 @@ simonSeqCurrent++;
                         check = checkPlayerInPut(TOP_LEFT);
                         break;
                     case R.id.topRight_imageButton:
+                       // Log.i("Status", "Call Cancel #2 onClick tr");
                         cancelPlayer();     // stop timer for player to respond
                         iIb = R.id.topRight_imageButton;
                         iDr = R.drawable.red_tr;
@@ -319,6 +327,7 @@ simonSeqCurrent++;
                         check = checkPlayerInPut(TOP_RIGHT);
                         break;
                     case R.id.bottomLeft_imageButton:
+                       // Log.i("Status", "Call Cancel #3 onClick bl");
                         cancelPlayer();     // stop timer for player to respond
                         iIb = R.id.bottomLeft_imageButton;
                         iDr = R.drawable.yellow_bl;
@@ -327,6 +336,7 @@ simonSeqCurrent++;
                         check = checkPlayerInPut(BOTTOM_LEFT);
                         break;
                     case R.id.bottomRight_imageButton:
+                       // Log.i("Status", "Call Cancel #4 onClick br");
                         cancelPlayer();     // stop timer for player to respond
                         iIb = R.id.bottomRight_imageButton;
                         iDr = R.drawable.cyan_br;
@@ -341,12 +351,13 @@ simonSeqCurrent++;
             checkAnswer ++;
             if(check && checkAnswer >=simonSeqCurrent){
                 updateScore();
+                cancelPlayer();
                 startNextRound();
             }
         }
         if(v.getId() == R.id.newGame_button){
             newGame();
-            Log.i("new Game", "newGame**********");
+           // Log.i("new Game", "newGame**********");
         }
 
     }
@@ -364,6 +375,7 @@ simonSeqCurrent++;
         simonSeqCurrent=0;
         resetCheckValues();
         isSimonsTurn = true;
+        cancelPlayer();
         setUpCurrentSequence();
         startCountdownGame();
 
@@ -390,6 +402,8 @@ simonSeqCurrent++;
         }
         simonSeqCurrent=0;
         resetCheckValues();
+        cancelButton();
+       // Log.i("Status", "Call Cancel #5 gameOver");
         cancelPlayer();
         isSimonsTurn = false;
         playSound(buzzer_Id);
@@ -429,7 +443,7 @@ simonSeqCurrent++;
                 @Override
                 public void run() {
                     resetImageButton(iDr);
-                    Log.i("ButtonTask", "-------------- " + count);
+                   // Log.i("ButtonTask", "-------------- " + count);
                 }
             });
             count++;
@@ -445,12 +459,13 @@ simonSeqCurrent++;
                 @Override
                 public void run() {
                     playerOutOfTime();
-                    Log.i("PlayerExpiredTask", "-------------- AGAIN");
+                   // Log.i("PlayerExpiredTask", "-------------- AGAIN");
                     gameOverTitle();
                     gameOver();
                 }
             });
-            cancelPlayer();
+          //  cancelPlayer();
+          //  Log.i("Status", "Cancel #6 PlayerExpiredTask");
            // gameOverTitle();
         }
 
@@ -473,6 +488,9 @@ simonSeqCurrent++;
         if (playerRespondTimer != null) {
             playerRespondTimer.cancel();
             playerRespondTimer = null;
+           // Log.i("STATUS", "cancelPLAYER TIMER " + playerCount );
+       // } else {
+           // Log.i("Status", "cancelPlayer Timer is null");
         }
 
     }
@@ -496,9 +514,9 @@ simonSeqCurrent++;
                 // status 0 is success
                 if (status == 0) {
                     soundsLoaded.add(sampleId);
-                    Log.i("SOUNDPOOL", " Sound loaded " + sampleId);
-                } else {
-                    Log.i("SOUNDPOOL", "Error loading sound " + status);
+                   // Log.i("SOUNDPOOL", " Sound loaded " + sampleId);
+              //  } else {
+                   // Log.i("SOUNDPOOL", "Error loading sound " + status);
                 }
             }
         });
@@ -523,6 +541,7 @@ simonSeqCurrent++;
         super.onPause();
         writeData();
         cancelButton();
+      //  Log.i("Status", "Call Cancel #7 onPause");
         cancelPlayer();
         if (soundpool != null) {
             soundpool.release();
@@ -576,7 +595,7 @@ simonSeqCurrent++;
 
         if (countDownTask != null && countDownTask.getStatus() == AsyncTask.Status.FINISHED) {
             countDownTask = null;
-            Log.i("countDownTask","*****************NULL********");
+           // Log.i("countDownTask","*****************NULL********");
         }
 
         if(countDownTask == null) {
@@ -699,7 +718,9 @@ simonSeqCurrent++;
                 setUpCurrentSequence();
             if(gameMode !=  2 ){
 
-            } isSimonsTurn = true;
+            }
+                cancelPlayer();
+                isSimonsTurn = true;
                 playSimonSequence();
         }
     }
