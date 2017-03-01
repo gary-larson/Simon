@@ -66,12 +66,13 @@
         app:srcCompat="@drawable/three1"
         android:id="@+id/count"
         android:visibility="invisible"
+        android:contentDescription="@string/count_description"
         android:layout_alignTop="@+id/topLeft_imageButton"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="44dp" />
 
     <TextView
-        android:text="Top Score: "
+        android:text="@string/top_score_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textView"
@@ -82,7 +83,7 @@
         android:layout_toStartOf="@+id/topScore_textView" />
 
     <TextView
-        android:text="0"
+        android:text="@string/zero"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/topScore_textView"
@@ -92,7 +93,7 @@
         android:layout_alignEnd="@+id/topRight_imageButton" />
 
     <TextView
-        android:text="Score: "
+        android:text="@string/score_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textView3"
@@ -102,7 +103,7 @@
         android:layout_toStartOf="@+id/topRight_imageButton" />
 
     <TextView
-        android:text="0"
+        android:text="@string/zero"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/score_textView"
@@ -136,7 +137,7 @@
         android:layout_centerHorizontal="true" />
 
     <Button
-        android:text="New Game"
+        android:text="@string/new_game_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/newGame_button"
