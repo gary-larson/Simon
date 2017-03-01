@@ -264,7 +264,7 @@ public class MainActivity extends AppCompatActivity
             // start timer for player to respond
            if (playerRespondTimer == null && check && !isSimonsTurn && !isGameOver) {
                 playerRespondTimer = new Timer();
-                playerRespondTimer.schedule(new PlayerTimeExpiredTask(), BUTTON_DELAY_1 * PLAYER_RESPONSE_MULTIPLIER);
+                playerRespondTimer.schedule(new PlayerTimeExpiredTask(), iDelay * PLAYER_RESPONSE_MULTIPLIER);
                playerCount++;
                // Log.i("STATUS", "Reset PLAYER TIMER " + playerCount );
            //} else {
@@ -311,7 +311,7 @@ public class MainActivity extends AppCompatActivity
             // start timer for player to respond disabled for troubleshooting
             if (playerRespondTimer == null) {
                 playerRespondTimer = new Timer();
-                playerRespondTimer.schedule(new PlayerTimeExpiredTask(), BUTTON_DELAY_1 * PLAYER_RESPONSE_MULTIPLIER);
+                playerRespondTimer.schedule(new PlayerTimeExpiredTask(), iDelay * PLAYER_RESPONSE_MULTIPLIER);
                 playerCount++;
                // Log.i("STATUS", "PlaySimon PLAYER TIMER " + playerCount );
             }
