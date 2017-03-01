@@ -1,17 +1,18 @@
 package com.example.gary.simon;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.media.AudioAttributes;
 import android.media.SoundPool;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
+//import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
-import android.util.Log;
+//import android.text.Html;
+//import android.text.method.LinkMovementMethod;
+//import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,7 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
+//import org.w3c.dom.Text;
 
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity
     private Timer playerRespondTimer;
     // iIb is current ImageButton, iDr is current Drawable, iDelay is current speed of the game
     private int iIb, iDr, iDelay = BUTTON_DELAY_1;
-    private int count = 0;
+    private int count = 0, playerCount = 0;
 
     //Soundpool Variables
     private SoundPool soundpool;
@@ -87,7 +88,7 @@ public class MainActivity extends AppCompatActivity
     private int cycleThruSequence =0;
     private boolean isSimonsTurn = true;
     private int simonSeqCurrent = 0;
-    Random rand  = new Random();
+    private Random rand  = new Random();
 
     private static final String DATA_FILENAME = "simon.txt";
 
@@ -106,6 +107,7 @@ public class MainActivity extends AppCompatActivity
 
         //Initialize sequence Array
         simonSequence = new int[MAX_SEQ_LENGTH];
+
 
 
         // SoundPool variable initialization
@@ -138,6 +140,15 @@ public class MainActivity extends AppCompatActivity
             TextView tv = (TextView)findViewById(R.id.topScore_textView);
             tv.setText(String.valueOf(topScore));
         }
+        Intent mIntent = getIntent();
+        gameMode = mIntent.getIntExtra("gameMode", 0);
+        if (gameMode == 3) {
+            iDelay = BUTTON_DELAY_3;
+        } else if (gameMode == 2) {
+            iDelay = BUTTON_DELAY_2;
+        } else {
+            iDelay = BUTTON_DELAY_1;
+        }
         setUpCurrentSequence();
 
     }
@@ -159,6 +170,9 @@ public class MainActivity extends AppCompatActivity
                 simonSeqCurrent = scanner.nextInt();
                 for (i = 0; i < simonSeqCurrent; i++)
                     simonSequence[i] = scanner.nextInt();
+                if (scanner.hasNextInt()) {
+                    gameMode = scanner.nextInt();
+                }
             }
             scanner.close();
         } catch (FileNotFoundException e) {
@@ -190,10 +204,10 @@ public class MainActivity extends AppCompatActivity
             pw.println(simonSeqCurrent);
             for (i = 0; i < simonSeqCurrent; i++)
                 pw.println(simonSequence[i]);
-            Log.i("count", "**********************"+ simonSequence[i]+ "** "+simonSeqCurrent );
+            // Log.i("count", "**********************"+ simonSequence[i]+ "** "+simonSeqCurrent );
 
             // Log.i("INFO", "---------- Write DATA COMPLETE");
-
+            pw.println(gameMode);
             pw.close();
         } catch (FileNotFoundException e) {
             // Log.e("WRITE_ERR", "Cannot save data: " + e.getMessage());
@@ -205,18 +219,15 @@ public class MainActivity extends AppCompatActivity
     * Method creates simon sequence.
     ****************************************************************************************** */
     private void setUpCurrentSequence(){
+        if (gameMode == 3) {
+            for (int i = 0; i < simonSeqCurrent; i++) {
+                simonSequence[i] = rand.nextInt(4) + 1;
+            }
+        }
 
         simonSequence[simonSeqCurrent] = rand.nextInt(4) + 1;
-       /*
-        simonSequence[simonSeqCurrent] = 1;
+
         simonSeqCurrent++;
-        simonSequence[simonSeqCurrent] = 2;
-        simonSeqCurrent++;
-        simonSequence[simonSeqCurrent] = 3;
-        simonSeqCurrent++;
-        simonSequence[simonSeqCurrent] = 4;
-simonSeqCurrent++;
-        */simonSeqCurrent++;
     }
 
     private void playSimonSequence() {
@@ -246,9 +257,13 @@ simonSeqCurrent++;
 
         else {
             // start timer for player to respond
-           if (playerRespondTimer == null && checkAnswer >= simonSeqCurrent) {
+           if (playerRespondTimer == null && check) {
                 playerRespondTimer = new Timer();
-                playerRespondTimer.schedule(new PlayerTimeExpiredTask(), iDelay * PLAYER_RESPONSE_MULTIPLIER);
+                playerRespondTimer.schedule(new PlayerTimeExpiredTask(), BUTTON_DELAY_1 * PLAYER_RESPONSE_MULTIPLIER);
+               playerCount++;
+               // Log.i("STATUS", "Reset PLAYER TIMER " + playerCount );
+           //} else {
+              // Log.i("STATUS", "Reset PLAYER TIMER not fired NOT NULL");
            }
         }
     }
@@ -291,7 +306,9 @@ simonSeqCurrent++;
             // start timer for player to respond disabled for troubleshooting
             if (playerRespondTimer == null) {
                 playerRespondTimer = new Timer();
-                playerRespondTimer.schedule(new PlayerTimeExpiredTask(), iDelay * PLAYER_RESPONSE_MULTIPLIER);
+                playerRespondTimer.schedule(new PlayerTimeExpiredTask(), BUTTON_DELAY_1 * PLAYER_RESPONSE_MULTIPLIER);
+                playerCount++;
+               // Log.i("STATUS", "PlaySimon PLAYER TIMER " + playerCount );
             }
         }
     }
@@ -303,6 +320,7 @@ simonSeqCurrent++;
             if (timer == null) {
                 switch (v.getId()) {
                     case R.id.topLeft_imageButton:
+                       // Log.i("Status", "Call Cancel #1 onClick tl");
                         cancelPlayer();     // stop timer for player to respond
                         iIb = R.id.topLeft_imageButton;
                         iDr = R.drawable.green_tl;
@@ -311,6 +329,7 @@ simonSeqCurrent++;
                         check = checkPlayerInPut(TOP_LEFT);
                         break;
                     case R.id.topRight_imageButton:
+                       // Log.i("Status", "Call Cancel #2 onClick tr");
                         cancelPlayer();     // stop timer for player to respond
                         iIb = R.id.topRight_imageButton;
                         iDr = R.drawable.red_tr;
@@ -319,6 +338,7 @@ simonSeqCurrent++;
                         check = checkPlayerInPut(TOP_RIGHT);
                         break;
                     case R.id.bottomLeft_imageButton:
+                       // Log.i("Status", "Call Cancel #3 onClick bl");
                         cancelPlayer();     // stop timer for player to respond
                         iIb = R.id.bottomLeft_imageButton;
                         iDr = R.drawable.yellow_bl;
@@ -327,6 +347,7 @@ simonSeqCurrent++;
                         check = checkPlayerInPut(BOTTOM_LEFT);
                         break;
                     case R.id.bottomRight_imageButton:
+                       // Log.i("Status", "Call Cancel #4 onClick br");
                         cancelPlayer();     // stop timer for player to respond
                         iIb = R.id.bottomRight_imageButton;
                         iDr = R.drawable.cyan_br;
@@ -341,12 +362,13 @@ simonSeqCurrent++;
             checkAnswer ++;
             if(check && checkAnswer >=simonSeqCurrent){
                 updateScore();
+                cancelPlayer();
                 startNextRound();
             }
         }
         if(v.getId() == R.id.newGame_button){
             newGame();
-            Log.i("new Game", "newGame**********");
+           // Log.i("new Game", "newGame**********");
         }
 
     }
@@ -364,6 +386,7 @@ simonSeqCurrent++;
         simonSeqCurrent=0;
         resetCheckValues();
         isSimonsTurn = true;
+        cancelPlayer();
         setUpCurrentSequence();
         startCountdownGame();
 
@@ -372,7 +395,7 @@ simonSeqCurrent++;
     * method will compare Simon's sequence to users input correct return true and start next round
      * if not correct buzz and ask user to start new game.
      *********************************************************************************************/
-    public boolean checkPlayerInPut(int input){
+    private boolean checkPlayerInPut(int input){
         if(input == simonSequence[checkAnswer]){
             return true;
         }else {
@@ -385,12 +408,15 @@ simonSeqCurrent++;
      * button and reset timers/threads
      *********************************************************************************************/
     private void gameOver(){
+        cancelPlayer();
         for(int i =0; i<simonSeqCurrent; i++){
             simonSequence[i] =0;
         }
         simonSeqCurrent=0;
         resetCheckValues();
-        cancelPlayer();
+       // cancelButton();
+       // Log.i("Status", "Call Cancel #5 gameOver");
+
         isSimonsTurn = false;
         playSound(buzzer_Id);
         if(nextRoundTask != null){
@@ -403,7 +429,7 @@ simonSeqCurrent++;
      *************************************************************************************/
     private void updateScore(){
         TextView tv =(TextView)findViewById(R.id.score_textView);
-        currentScore = simonSeqCurrent;
+        currentScore = simonSeqCurrent * gameMode;
         tv.setText(String.valueOf(currentScore));
 
         if(currentScore > topScore){
@@ -418,10 +444,10 @@ simonSeqCurrent++;
     private void gameOverTitle(){
         enablePlayerButtons = false;
         TextView tv = (TextView)findViewById(R.id.gameOver_textview);
-        tv.setText("GAME OVER!!");
+        tv.setText(R.string.game_over_label);
     }
     // Callback method for the timer resets image and cancels timer Count is for debugging
-    class ButtonTask extends TimerTask {
+    private class ButtonTask extends TimerTask {
         @Override
         public void run() {
 
@@ -429,7 +455,7 @@ simonSeqCurrent++;
                 @Override
                 public void run() {
                     resetImageButton(iDr);
-                    Log.i("ButtonTask", "-------------- " + count);
+                   // Log.i("ButtonTask", "-------------- " + count);
                 }
             });
             count++;
@@ -445,12 +471,13 @@ simonSeqCurrent++;
                 @Override
                 public void run() {
                     playerOutOfTime();
-                    Log.i("PlayerExpiredTask", "-------------- AGAIN");
+                   // Log.i("PlayerExpiredTask", "-------------- AGAIN");
                     gameOverTitle();
                     gameOver();
                 }
             });
-            cancelPlayer();
+          //  cancelPlayer();
+          //  Log.i("Status", "Cancel #6 PlayerExpiredTask");
            // gameOverTitle();
         }
 
@@ -473,6 +500,9 @@ simonSeqCurrent++;
         if (playerRespondTimer != null) {
             playerRespondTimer.cancel();
             playerRespondTimer = null;
+           // Log.i("STATUS", "cancelPLAYER TIMER " + playerCount );
+       // } else {
+           // Log.i("Status", "cancelPlayer Timer is null");
         }
 
     }
@@ -496,9 +526,9 @@ simonSeqCurrent++;
                 // status 0 is success
                 if (status == 0) {
                     soundsLoaded.add(sampleId);
-                    Log.i("SOUNDPOOL", " Sound loaded " + sampleId);
-                } else {
-                    Log.i("SOUNDPOOL", "Error loading sound " + status);
+                   // Log.i("SOUNDPOOL", " Sound loaded " + sampleId);
+              //  } else {
+                   // Log.i("SOUNDPOOL", "Error loading sound " + status);
                 }
             }
         });
@@ -523,6 +553,7 @@ simonSeqCurrent++;
         super.onPause();
         writeData();
         cancelButton();
+      //  Log.i("Status", "Call Cancel #7 onPause");
         cancelPlayer();
         if (soundpool != null) {
             soundpool.release();
@@ -536,7 +567,7 @@ simonSeqCurrent++;
                             LOOK AT
           if we dont need lets get rid of onCreateOptionsMenu,onOptionsItemSelected
      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-
+/*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -557,7 +588,7 @@ simonSeqCurrent++;
         }
 
         return super.onOptionsItemSelected(item);
-    }
+    } */
 
     // plays sound related to button
     private void playSound (int iSound) {
@@ -572,11 +603,11 @@ simonSeqCurrent++;
      * If countdown thread is activate method prevents user from calling countdown thread until
      * multiple times.-By Antonio Ramos
      *****************************************************************************************/
-    public void startCountdownGame(){
+    private void startCountdownGame(){
 
         if (countDownTask != null && countDownTask.getStatus() == AsyncTask.Status.FINISHED) {
             countDownTask = null;
-            Log.i("countDownTask","*****************NULL********");
+           // Log.i("countDownTask","*****************NULL********");
         }
 
         if(countDownTask == null) {
@@ -678,7 +709,7 @@ simonSeqCurrent++;
     /********************************************************************************************
     * class creates delay between rounds and starts next round
      ****************************************************************************************/
-    class NextRoundTask extends AsyncTask<Void, Void, Integer>{
+    private class NextRoundTask extends AsyncTask<Void, Void, Integer>{
 
         @Override
         protected Integer doInBackground(Void... voids) {
@@ -697,9 +728,11 @@ simonSeqCurrent++;
             super.onPostExecute(integer);
 
                 setUpCurrentSequence();
-            if(gameMode !=  2 ){
+       //     if(gameMode !=  2 ){
 
-            } isSimonsTurn = true;
+       //     }
+                cancelPlayer();
+                isSimonsTurn = true;
                 playSimonSequence();
         }
     }

@@ -9,6 +9,9 @@
     <string name="cyan_button">Cyan Button</string>
     <string name="red_button">Red Button</string>
     <string name="green_button">Green Button</string>
+    <string name="mode_1">Normal</string>
+    <string name="mode_2">Fast</string>
+    <string name="mode_3">Insane</string>
 
 
 </resources>

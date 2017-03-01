@@ -39,7 +39,7 @@
         android:id="@+id/game_mode">
 
         <RadioButton
-            android:text="One Player"
+            android:text="@string/mode_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/one_radioButton"
@@ -49,7 +49,7 @@
             android:textStyle="normal|bold" />
 
         <RadioButton
-            android:text="Two vs Simon"
+            android:text="@string/mode_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/two_radioButton"
@@ -59,7 +59,7 @@
             android:textSize="30sp" />
 
         <RadioButton
-            android:text="Insane"
+            android:text="@string/mode_3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/insane_radioButton"

@@ -68,6 +68,7 @@ public class Title extends AppCompatActivity implements RadioGroup.OnCheckedChan
             //else start game
             else {
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.putExtra("gameMode", gameMode);
                 startActivity(intent);
             }
         }
@@ -174,12 +175,12 @@ public class Title extends AppCompatActivity implements RadioGroup.OnCheckedChan
             }
             scanner.close();
         } catch (FileNotFoundException e) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("NO top scores. Please play game to record a top score");
-            builder.setPositiveButton("OK", null);
+           // AlertDialog.Builder builder = new AlertDialog.Builder(this);
+           // builder.setMessage("NO top scores. Please play game to record a top score");
+           // builder.setPositiveButton("OK", null);
 
-            AlertDialog dialog = builder.create();
-            dialog.show();
+          //  AlertDialog dialog = builder.create();
+           // dialog.show();
 
             // Log.i("INFO", "---------- Read Exception");
             // ok if file does not exist
