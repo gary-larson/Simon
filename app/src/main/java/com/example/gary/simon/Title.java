@@ -34,7 +34,7 @@ public class Title extends AppCompatActivity implements RadioGroup.OnCheckedChan
         setContentView(R.layout.title);
         // test if instance was not restored initialize game and check for saved game added by Gary
         if (savedInstanceState == null) {
-            readData();
+           readData();
         }
 
         Button b = (Button) findViewById(R.id.play_button);
@@ -88,8 +88,8 @@ public class Title extends AppCompatActivity implements RadioGroup.OnCheckedChan
     }
     /******************************************************************************************
     * method will select what game mode will be set up
-     * GameMode= 1  - one player
-     * GameMode = 2 - Two player vs simon
+     * GameMode= 1  - Normal
+     * GameMode = 2 - Fast
      * GameMode= 3 - Insane mode(sequence will change every round)
      *****************************************************************************************/
     @Override
@@ -113,7 +113,7 @@ public class Title extends AppCompatActivity implements RadioGroup.OnCheckedChan
      * Class creates alertDialog to display apps' information about the developers and
      * credits to all sounds and images used.-By Antonio Ramos
      *****************************************************************************************/
-    class AboutApp implements View.OnClickListener {
+    private class AboutApp implements View.OnClickListener {
         @Override
         public void onClick(View view) {
             String message = "<html>" +
@@ -168,7 +168,7 @@ public class Title extends AppCompatActivity implements RadioGroup.OnCheckedChan
             // Log.i("INFO", "---------- Read Setup Done");
             if (scanner.hasNext()) {
                 // Log.i("INFO", "---------- Read has DATA");
-                int i;
+             //   int i;
 
                 top_Score = scanner.nextInt();
 

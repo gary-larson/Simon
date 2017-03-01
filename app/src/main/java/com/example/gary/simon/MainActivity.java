@@ -317,7 +317,7 @@ public class MainActivity extends AppCompatActivity
     public void onClick(View v) {
         //if statement disables player input into countdown thread is complete
         if(enablePlayerButtons) {
-            if (timer == null) {
+            if (timer == null && !isSimonsTurn) {
                 switch (v.getId()) {
                     case R.id.topLeft_imageButton:
                        // Log.i("Status", "Call Cancel #1 onClick tl");
