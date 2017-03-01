@@ -7,12 +7,12 @@ import android.media.AudioAttributes;
 import android.media.SoundPool;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
+//import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
-import android.util.Log;
+//import android.text.Html;
+//import android.text.method.LinkMovementMethod;
+//import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,7 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
+//import org.w3c.dom.Text;
 
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity
     private int cycleThruSequence =0;
     private boolean isSimonsTurn = true;
     private int simonSeqCurrent = 0;
-    Random rand  = new Random();
+    private Random rand  = new Random();
 
     private static final String DATA_FILENAME = "simon.txt";
 
@@ -257,7 +257,7 @@ public class MainActivity extends AppCompatActivity
 
         else {
             // start timer for player to respond
-           if (playerRespondTimer == null) {
+           if (playerRespondTimer == null && check) {
                 playerRespondTimer = new Timer();
                 playerRespondTimer.schedule(new PlayerTimeExpiredTask(), BUTTON_DELAY_1 * PLAYER_RESPONSE_MULTIPLIER);
                playerCount++;
@@ -395,7 +395,7 @@ public class MainActivity extends AppCompatActivity
     * method will compare Simon's sequence to users input correct return true and start next round
      * if not correct buzz and ask user to start new game.
      *********************************************************************************************/
-    public boolean checkPlayerInPut(int input){
+    private boolean checkPlayerInPut(int input){
         if(input == simonSequence[checkAnswer]){
             return true;
         }else {
@@ -408,6 +408,7 @@ public class MainActivity extends AppCompatActivity
      * button and reset timers/threads
      *********************************************************************************************/
     private void gameOver(){
+        cancelPlayer();
         for(int i =0; i<simonSeqCurrent; i++){
             simonSequence[i] =0;
         }
@@ -415,7 +416,7 @@ public class MainActivity extends AppCompatActivity
         resetCheckValues();
        // cancelButton();
        // Log.i("Status", "Call Cancel #5 gameOver");
-        cancelPlayer();
+
         isSimonsTurn = false;
         playSound(buzzer_Id);
         if(nextRoundTask != null){
@@ -443,10 +444,10 @@ public class MainActivity extends AppCompatActivity
     private void gameOverTitle(){
         enablePlayerButtons = false;
         TextView tv = (TextView)findViewById(R.id.gameOver_textview);
-        tv.setText("GAME OVER!!");
+        tv.setText(R.string.game_over_label);
     }
     // Callback method for the timer resets image and cancels timer Count is for debugging
-    class ButtonTask extends TimerTask {
+    private class ButtonTask extends TimerTask {
         @Override
         public void run() {
 
@@ -566,7 +567,7 @@ public class MainActivity extends AppCompatActivity
                             LOOK AT
           if we dont need lets get rid of onCreateOptionsMenu,onOptionsItemSelected
      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-
+/*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -587,7 +588,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
-    }
+    } */
 
     // plays sound related to button
     private void playSound (int iSound) {
@@ -602,7 +603,7 @@ public class MainActivity extends AppCompatActivity
      * If countdown thread is activate method prevents user from calling countdown thread until
      * multiple times.-By Antonio Ramos
      *****************************************************************************************/
-    public void startCountdownGame(){
+    private void startCountdownGame(){
 
         if (countDownTask != null && countDownTask.getStatus() == AsyncTask.Status.FINISHED) {
             countDownTask = null;
@@ -708,7 +709,7 @@ public class MainActivity extends AppCompatActivity
     /********************************************************************************************
     * class creates delay between rounds and starts next round
      ****************************************************************************************/
-    class NextRoundTask extends AsyncTask<Void, Void, Integer>{
+    private class NextRoundTask extends AsyncTask<Void, Void, Integer>{
 
         @Override
         protected Integer doInBackground(Void... voids) {
@@ -727,9 +728,9 @@ public class MainActivity extends AppCompatActivity
             super.onPostExecute(integer);
 
                 setUpCurrentSequence();
-            if(gameMode !=  2 ){
+       //     if(gameMode !=  2 ){
 
-            }
+       //     }
                 cancelPlayer();
                 isSimonsTurn = true;
                 playSimonSequence();
