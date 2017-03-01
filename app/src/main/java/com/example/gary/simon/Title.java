@@ -36,7 +36,6 @@ public class Title extends AppCompatActivity implements RadioGroup.OnCheckedChan
         if (savedInstanceState == null) {
            readData();
         }
-
         Button b = (Button) findViewById(R.id.play_button);
         b.setOnClickListener(this);
         b = (Button) findViewById(R.id.score_button);
@@ -49,6 +48,13 @@ public class Title extends AppCompatActivity implements RadioGroup.OnCheckedChan
         //Set up listener for about button
         findViewById(R.id.about_button).setOnClickListener(new AboutApp());
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        readData();
+    }
+
     /******************************************************************************************
      * method will start game, display developer's information, top score, and instruction
      * layout
@@ -75,7 +81,7 @@ public class Title extends AppCompatActivity implements RadioGroup.OnCheckedChan
         if(view.getId() == R.id.score_button){
 
             AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-            builder.setMessage("Here is the to top score: " +top_Score);
+            builder.setMessage("TOP SCORE: " +top_Score);
             builder.setPositiveButton("OK", null);
 
             AlertDialog dialog = builder.create();
@@ -106,9 +112,7 @@ public class Title extends AppCompatActivity implements RadioGroup.OnCheckedChan
             gameModeChosen =true;
             gameMode = 3;
         }
-
     }
-
     /******************************************************************************************
      * Class creates alertDialog to display apps' information about the developers and
      * credits to all sounds and images used.-By Antonio Ramos
@@ -169,19 +173,10 @@ public class Title extends AppCompatActivity implements RadioGroup.OnCheckedChan
             if (scanner.hasNext()) {
                 // Log.i("INFO", "---------- Read has DATA");
              //   int i;
-
                 top_Score = scanner.nextInt();
-
             }
             scanner.close();
         } catch (FileNotFoundException e) {
-           // AlertDialog.Builder builder = new AlertDialog.Builder(this);
-           // builder.setMessage("NO top scores. Please play game to record a top score");
-           // builder.setPositiveButton("OK", null);
-
-          //  AlertDialog dialog = builder.create();
-           // dialog.show();
-
             // Log.i("INFO", "---------- Read Exception");
             // ok if file does not exist
         }
