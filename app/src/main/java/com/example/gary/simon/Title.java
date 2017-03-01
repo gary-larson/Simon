@@ -68,6 +68,7 @@ public class Title extends AppCompatActivity implements RadioGroup.OnCheckedChan
             //else start game
             else {
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.putExtra("gameMode", gameMode);
                 startActivity(intent);
             }
         }

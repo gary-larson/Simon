@@ -1,6 +1,7 @@
 package com.example.gary.simon;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.media.AudioAttributes;
 import android.media.SoundPool;
@@ -108,6 +109,7 @@ public class MainActivity extends AppCompatActivity
         simonSequence = new int[MAX_SEQ_LENGTH];
 
 
+
         // SoundPool variable initialization
         soundsLoaded = new HashSet<Integer>();
 
@@ -138,6 +140,15 @@ public class MainActivity extends AppCompatActivity
             TextView tv = (TextView)findViewById(R.id.topScore_textView);
             tv.setText(String.valueOf(topScore));
         }
+        Intent mIntent = getIntent();
+        gameMode = mIntent.getIntExtra("gameMode", 0);
+        if (gameMode == 3) {
+            iDelay = BUTTON_DELAY_3;
+        } else if (gameMode == 2) {
+            iDelay = BUTTON_DELAY_2;
+        } else {
+            iDelay = BUTTON_DELAY_1;
+        }
         setUpCurrentSequence();
 
     }
@@ -159,6 +170,9 @@ public class MainActivity extends AppCompatActivity
                 simonSeqCurrent = scanner.nextInt();
                 for (i = 0; i < simonSeqCurrent; i++)
                     simonSequence[i] = scanner.nextInt();
+                if (scanner.hasNextInt()) {
+                    gameMode = scanner.nextInt();
+                }
             }
             scanner.close();
         } catch (FileNotFoundException e) {
@@ -193,7 +207,7 @@ public class MainActivity extends AppCompatActivity
             // Log.i("count", "**********************"+ simonSequence[i]+ "** "+simonSeqCurrent );
 
             // Log.i("INFO", "---------- Write DATA COMPLETE");
-
+            pw.println(gameMode);
             pw.close();
         } catch (FileNotFoundException e) {
             // Log.e("WRITE_ERR", "Cannot save data: " + e.getMessage());
@@ -205,18 +219,15 @@ public class MainActivity extends AppCompatActivity
     * Method creates simon sequence.
     ****************************************************************************************** */
     private void setUpCurrentSequence(){
+        if (gameMode == 3) {
+            for (int i = 0; i < simonSeqCurrent; i++) {
+                simonSequence[i] = rand.nextInt(4) + 1;
+            }
+        }
 
         simonSequence[simonSeqCurrent] = rand.nextInt(4) + 1;
-       /*
-        simonSequence[simonSeqCurrent] = 1;
+
         simonSeqCurrent++;
-        simonSequence[simonSeqCurrent] = 2;
-        simonSeqCurrent++;
-        simonSequence[simonSeqCurrent] = 3;
-        simonSeqCurrent++;
-        simonSequence[simonSeqCurrent] = 4;
-simonSeqCurrent++;
-        */simonSeqCurrent++;
     }
 
     private void playSimonSequence() {
@@ -248,7 +259,7 @@ simonSeqCurrent++;
             // start timer for player to respond
            if (playerRespondTimer == null) {
                 playerRespondTimer = new Timer();
-                playerRespondTimer.schedule(new PlayerTimeExpiredTask(), iDelay * PLAYER_RESPONSE_MULTIPLIER);
+                playerRespondTimer.schedule(new PlayerTimeExpiredTask(), BUTTON_DELAY_1 * PLAYER_RESPONSE_MULTIPLIER);
                playerCount++;
                // Log.i("STATUS", "Reset PLAYER TIMER " + playerCount );
            //} else {
@@ -295,7 +306,7 @@ simonSeqCurrent++;
             // start timer for player to respond disabled for troubleshooting
             if (playerRespondTimer == null) {
                 playerRespondTimer = new Timer();
-                playerRespondTimer.schedule(new PlayerTimeExpiredTask(), iDelay * PLAYER_RESPONSE_MULTIPLIER);
+                playerRespondTimer.schedule(new PlayerTimeExpiredTask(), BUTTON_DELAY_1 * PLAYER_RESPONSE_MULTIPLIER);
                 playerCount++;
                // Log.i("STATUS", "PlaySimon PLAYER TIMER " + playerCount );
             }
@@ -402,7 +413,7 @@ simonSeqCurrent++;
         }
         simonSeqCurrent=0;
         resetCheckValues();
-        cancelButton();
+       // cancelButton();
        // Log.i("Status", "Call Cancel #5 gameOver");
         cancelPlayer();
         isSimonsTurn = false;
@@ -417,7 +428,7 @@ simonSeqCurrent++;
      *************************************************************************************/
     private void updateScore(){
         TextView tv =(TextView)findViewById(R.id.score_textView);
-        currentScore = simonSeqCurrent;
+        currentScore = simonSeqCurrent * gameMode;
         tv.setText(String.valueOf(currentScore));
 
         if(currentScore > topScore){
