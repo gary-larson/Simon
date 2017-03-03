@@ -97,7 +97,6 @@ public class MainActivity extends AppCompatActivity
     private int gameMode =2;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,8 +107,6 @@ public class MainActivity extends AppCompatActivity
 
         //Initialize sequence Array
         simonSequence = new int[MAX_SEQ_LENGTH];
-
-
 
         // SoundPool variable initialization
         soundsLoaded = new HashSet<Integer>();
@@ -151,7 +148,6 @@ public class MainActivity extends AppCompatActivity
             iDelay = BUTTON_DELAY_1;
         }
         setUpCurrentSequence();
-
     }
 
     // read game state from file added by Gary
@@ -226,11 +222,11 @@ public class MainActivity extends AppCompatActivity
                     simonSequence[i] = rand.nextInt(4) + 1;
                 }
             }
-
             simonSequence[simonSeqCurrent] = rand.nextInt(4) + 1;
 
             simonSeqCurrent++;
         }
+
     }
 
     private void playSimonSequence() {
@@ -272,7 +268,6 @@ public class MainActivity extends AppCompatActivity
            }
         }
     }
-
     private void playSimonNext() {
         if (simonSequence[cycleThruSequence] > 0) {
             switch (simonSequence[cycleThruSequence]) {
@@ -483,7 +478,6 @@ public class MainActivity extends AppCompatActivity
             cancelButton();
         }
     }
-
     private class PlayerTimeExpiredTask extends TimerTask {
         @Override
         public void run() {
@@ -501,7 +495,6 @@ public class MainActivity extends AppCompatActivity
           //  Log.i("Status", "Cancel #6 PlayerExpiredTask");
            // gameOverTitle();
         }
-
     }
 
     // method to cancel timer
@@ -525,7 +518,6 @@ public class MainActivity extends AppCompatActivity
        // } else {
            // Log.i("Status", "cancelPlayer Timer is null");
         }
-
     }
     // use onResume to setup SoundPool
     @Override
@@ -584,40 +576,12 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                            LOOK AT
-          if we dont need lets get rid of onCreateOptionsMenu,onOptionsItemSelected
-     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-/*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    } */
-
     // plays sound related to button
     private void playSound (int iSound) {
         if (soundsLoaded.contains(iSound) && !isGameOver) {
             soundpool.play(iSound, 1.0f, 1.0f, 0, 0, (float) iDelay / (float) BUTTON_DELAY_1);
         }
     }
-
 
     /******************************************************************************************
      * Method activates countdown thread to give user time to get ready before game begin/resumes.
@@ -654,9 +618,8 @@ public class MainActivity extends AppCompatActivity
             enablePlayerButtons = false;
             im.setVisibility(View.VISIBLE);
             layout.setBackgroundColor(0xffeb0404);
-
-
         }
+
         //pause thread three times with one second interval.
         @Override
         protected Integer doInBackground(Void... voids) {
@@ -701,9 +664,6 @@ public class MainActivity extends AppCompatActivity
 
                 // added to start game
                 playSimonSequence();
-
-
-
         }
     }
 
@@ -720,8 +680,6 @@ public class MainActivity extends AppCompatActivity
         nextRoundTask = new NextRoundTask();
         resetCheckValues();
         nextRoundTask.execute();
-
-
        // isSimonsTurn = true;
 
        // setUpCurrentSequence(); //for debugging
@@ -743,15 +701,11 @@ public class MainActivity extends AppCompatActivity
             }
             return null;
         }
-
         @Override
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
 
                 setUpCurrentSequence();
-       //     if(gameMode !=  2 ){
-
-       //     }
                 cancelPlayer();
                 isSimonsTurn = true;
                 playSimonSequence();
