@@ -147,7 +147,7 @@ public class Title extends AppCompatActivity implements RadioGroup.OnCheckedChan
                     "<b>Link: </b> <a href='http://openclipart.org/detail/173820/" +
                     "colourful-abstract-background/content/space-boss-battle-theme'>" +
                     "source website</a><br>" +
-                    "<b>License: </b> ?" +
+                    "<b>License: </b> Public domain (PD)" +
 
                     "</p></html>";
             AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());

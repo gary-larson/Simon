@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity
     private CountDownTask countDownTask;
     private boolean delayCountDown = false;
     private final int [] countNumbers= {R.drawable.three1,R.drawable.two1,R.drawable.one1};
+    private boolean countDownSound = false;
 
     //players variables
     private boolean enablePlayerButtons;      //flag disables players input until countdown is complete
@@ -530,7 +531,7 @@ public class MainActivity extends AppCompatActivity
 
         SoundPool.Builder sb = new SoundPool.Builder();
         sb.setAudioAttributes(attrBuilder.build());
-        sb.setMaxStreams(2);
+        sb.setMaxStreams(3);
         soundpool = sb.build();
 
         soundpool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
@@ -575,14 +576,19 @@ public class MainActivity extends AppCompatActivity
             soundsLoaded.clear();
         }
     }
-
     // plays sound related to button
     private void playSound (int iSound) {
+
         if (soundsLoaded.contains(iSound) && !isGameOver) {
+            //when playSound is called from countdown thread
+            if(countDownSound){
+                soundpool.play(iSound, 1.0f, 1.0f, 0, 0, 2.2f);
+                countDownSound = false;
+            }
+            else
             soundpool.play(iSound, 1.0f, 1.0f, 0, 0, (float) iDelay / (float) BUTTON_DELAY_1);
         }
     }
-
     /******************************************************************************************
      * Method activates countdown thread to give user time to get ready before game begin/resumes.
      * If countdown thread is activate method prevents user from calling countdown thread until
@@ -598,7 +604,6 @@ public class MainActivity extends AppCompatActivity
         if(countDownTask == null) {
             countDownTask = new CountDownTask();
             countDownTask.execute();
-
         }
     }
     /******************************************************************************************
@@ -618,8 +623,8 @@ public class MainActivity extends AppCompatActivity
             enablePlayerButtons = false;
             im.setVisibility(View.VISIBLE);
             layout.setBackgroundColor(0xffeb0404);
-        }
 
+        }
         //pause thread three times with one second interval.
         @Override
         protected Integer doInBackground(Void... voids) {
@@ -642,6 +647,9 @@ public class MainActivity extends AppCompatActivity
         //updates images and sounds on the main UI
         @Override
         protected void onProgressUpdate(Integer... values) {
+            countDownSound = true;
+            //play countdown sound
+            playSound (sound_bl_Id);
             super.onProgressUpdate(values);
             if(values[0] == 1){
                 layout.setBackgroundColor(0xfffffd15);
@@ -655,6 +663,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
+
             RelativeLayout rl = (RelativeLayout) findViewById(R.id.content_main);
             im.setImageResource(R.drawable.three1);
             im.setVisibility(View.INVISIBLE);
@@ -666,7 +675,6 @@ public class MainActivity extends AppCompatActivity
                 playSimonSequence();
         }
     }
-
     // Player did not respond in time
     private void playerOutOfTime() {
         playSound(buzzer_Id);
@@ -675,11 +683,11 @@ public class MainActivity extends AppCompatActivity
         checkAnswer =0;
         cycleThruSequence =0;
     }
-
     private void startNextRound(){
         nextRoundTask = new NextRoundTask();
         resetCheckValues();
         nextRoundTask.execute();
+
        // isSimonsTurn = true;
 
        // setUpCurrentSequence(); //for debugging
