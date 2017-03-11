@@ -97,6 +97,10 @@ public class MainActivity extends AppCompatActivity
     //Variable is used to select game mode
     private int gameMode =2;
 
+    //game buttons
+    private int [] buttonId = {R.id.topRight_imageButton, R.id.topLeft_imageButton,
+                                R.id.bottomRight_imageButton,R.id.bottomLeft_imageButton};
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -236,6 +240,7 @@ public class MainActivity extends AppCompatActivity
             cycleThruSequence = 0;
             playSimonNext();
         }
+        setButtons(false);
     }
 
     // method to change image to pressed image and start the timer
@@ -309,6 +314,7 @@ public class MainActivity extends AppCompatActivity
                 playerRespondTimer = new Timer();
                 playerRespondTimer.schedule(new PlayerTimeExpiredTask(), iDelay * PLAYER_RESPONSE_MULTIPLIER);
                 playerCount++;
+                setButtons(true);
                // Log.i("STATUS", "PlaySimon PLAYER TIMER " + playerCount );
             }
         }
@@ -623,6 +629,7 @@ public class MainActivity extends AppCompatActivity
             enablePlayerButtons = false;
             im.setVisibility(View.VISIBLE);
             layout.setBackgroundColor(0xffeb0404);
+            setButtons(false);
 
         }
         //pause thread three times with one second interval.
@@ -670,6 +677,7 @@ public class MainActivity extends AppCompatActivity
             rl.setBackgroundResource(R.drawable.background1);
             delayCountDown = false;
             enablePlayerButtons = true;
+            setButtons(true);
 
                 // added to start game
                 playSimonSequence();
@@ -697,6 +705,11 @@ public class MainActivity extends AppCompatActivity
     * class creates delay between rounds and starts next round
      ****************************************************************************************/
     private class NextRoundTask extends AsyncTask<Void, Void, Integer>{
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            setButtons(false);
+        }
 
         @Override
         protected Integer doInBackground(Void... voids) {
@@ -712,11 +725,22 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
-
                 setUpCurrentSequence();
                 cancelPlayer();
                 isSimonsTurn = true;
+                setButtons(true);
                 playSimonSequence();
+        }
+    }
+
+    /**********************************************************************************************
+     * method will enable and disable game buttons- by Antonio Ramos
+     *******************************************************************************************/
+    private void setButtons(boolean set){
+        for(int i = 0 ; i<4 ; i++){
+            ImageButton gameButton = (ImageButton)findViewById(buttonId[i]);
+            gameButton.setEnabled(set);
+
         }
     }
 
